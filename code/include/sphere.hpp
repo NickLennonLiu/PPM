@@ -4,6 +4,7 @@
 #include "object3d.hpp"
 #include <vecmath.h>
 #include <cmath>
+#include "aabb.hpp"
 
 class Sphere : public Object3D {
 public:
@@ -11,6 +12,7 @@ public:
     : center(Vector3f(0))
     , radius(0)
     {
+        gen_box();
         // unit ball at the center
     }
 
@@ -19,11 +21,14 @@ public:
     , center(center)
     , radius(radius)
     {
+        gen_box();
     }
 
     ~Sphere() override = default;
 
     bool intersect(const Ray &r, Hit &h, float tmin) override {
+        bool re = box.intersect(r, h, tmin);
+        return re;
         Vector3f dir = r.getDirection().normalized();
         Vector3f l = (center - r.getOrigin());      // 球心与视线来源的连线
         float l2 = l.squaredLength();
@@ -56,6 +61,12 @@ public:
 protected:
     float radius;
     Vector3f center;
+    AABB box;
+
+    void gen_box()
+    {
+        box = AABB({{center[0] - radius, center[0] + radius}, {center[1] - radius, center[1] + radius}, {center[2] - radius, center[2] + radius}}, material);
+    }
 };
 
 

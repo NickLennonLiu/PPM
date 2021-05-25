@@ -6,5 +6,5 @@ CXX_FLAGS = -O3 -DNDEBUG   -std=gnu++11
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/mnt/c/Users/11722/code/CG/PA1/code/include -I/mnt/c/Users/11722/code/CG/PA1/code/deps/vecmath/include 
+CXX_INCLUDES = -I/mnt/c/Users/11722/code/CG/PPM/code/include -I/mnt/c/Users/11722/code/CG/PPM/code/deps/vecmath/include 
 

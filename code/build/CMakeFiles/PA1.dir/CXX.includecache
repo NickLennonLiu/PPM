@@ -46,6 +46,22 @@ Vector3f.h
 Vector4f.h
 ../deps/vecmath/include/Vector4f.h
 
+../include/aabb.hpp
+object3d.hpp
+../include/object3d.hpp
+vecmath.h
+-
+vector
+-
+utility
+-
+algorithm
+-
+iostream
+-
+plane.hpp
+../include/plane.hpp
+
 ../include/camera.hpp
 ray.hpp
 ../include/ray.hpp
@@ -54,6 +70,18 @@ vecmath.h
 float.h
 -
 cmath
+-
+
+../include/curve.hpp
+object3d.hpp
+../include/object3d.hpp
+vecmath.h
+-
+vector
+-
+utility
+-
+algorithm
 -
 
 ../include/group.hpp
@@ -88,6 +116,8 @@ object3d.hpp
 cassert
 -
 vecmath.h
+-
+iostream
 -
 ray.hpp
 ../include/ray.hpp
@@ -130,6 +160,14 @@ iostream
 Vector3f.h
 -
 
+../include/revsurface.hpp
+object3d.hpp
+../include/object3d.hpp
+curve.hpp
+../include/curve.hpp
+tuple
+-
+
 ../include/scene_parser.hpp
 cassert
 -
@@ -143,6 +181,8 @@ vecmath.h
 -
 cmath
 -
+aabb.hpp
+../include/aabb.hpp
 
 ../include/transform.hpp
 vecmath.h
@@ -158,7 +198,7 @@ vecmath.h
 cmath
 -
 
-/mnt/c/Users/11722/code/CG/PA1/code/src/image.cpp
+/mnt/c/Users/11722/code/CG/PPM/code/src/image.cpp
 cstdlib
 -
 cstdio
@@ -166,9 +206,9 @@ cstdio
 cstring
 -
 image.hpp
-/mnt/c/Users/11722/code/CG/PA1/code/src/image.hpp
+/mnt/c/Users/11722/code/CG/PPM/code/src/image.hpp
 
-/mnt/c/Users/11722/code/CG/PA1/code/src/main.cpp
+/mnt/c/Users/11722/code/CG/PPM/code/src/main.cpp
 cassert
 -
 cstdio
@@ -182,21 +222,21 @@ cmath
 iostream
 -
 scene_parser.hpp
-/mnt/c/Users/11722/code/CG/PA1/code/src/scene_parser.hpp
+/mnt/c/Users/11722/code/CG/PPM/code/src/scene_parser.hpp
 image.hpp
-/mnt/c/Users/11722/code/CG/PA1/code/src/image.hpp
+/mnt/c/Users/11722/code/CG/PPM/code/src/image.hpp
 camera.hpp
-/mnt/c/Users/11722/code/CG/PA1/code/src/camera.hpp
+/mnt/c/Users/11722/code/CG/PPM/code/src/camera.hpp
 group.hpp
-/mnt/c/Users/11722/code/CG/PA1/code/src/group.hpp
+/mnt/c/Users/11722/code/CG/PPM/code/src/group.hpp
 light.hpp
-/mnt/c/Users/11722/code/CG/PA1/code/src/light.hpp
+/mnt/c/Users/11722/code/CG/PPM/code/src/light.hpp
 string
 -
 
-/mnt/c/Users/11722/code/CG/PA1/code/src/mesh.cpp
+/mnt/c/Users/11722/code/CG/PPM/code/src/mesh.cpp
 mesh.hpp
-/mnt/c/Users/11722/code/CG/PA1/code/src/mesh.hpp
+/mnt/c/Users/11722/code/CG/PPM/code/src/mesh.hpp
 fstream
 -
 iostream
@@ -210,7 +250,7 @@ utility
 sstream
 -
 
-/mnt/c/Users/11722/code/CG/PA1/code/src/scene_parser.cpp
+/mnt/c/Users/11722/code/CG/PPM/code/src/scene_parser.cpp
 cstdio
 -
 cstring
@@ -220,25 +260,29 @@ cstdlib
 cmath
 -
 scene_parser.hpp
-/mnt/c/Users/11722/code/CG/PA1/code/src/scene_parser.hpp
+/mnt/c/Users/11722/code/CG/PPM/code/src/scene_parser.hpp
 camera.hpp
-/mnt/c/Users/11722/code/CG/PA1/code/src/camera.hpp
+/mnt/c/Users/11722/code/CG/PPM/code/src/camera.hpp
 light.hpp
-/mnt/c/Users/11722/code/CG/PA1/code/src/light.hpp
+/mnt/c/Users/11722/code/CG/PPM/code/src/light.hpp
 material.hpp
-/mnt/c/Users/11722/code/CG/PA1/code/src/material.hpp
+/mnt/c/Users/11722/code/CG/PPM/code/src/material.hpp
 object3d.hpp
-/mnt/c/Users/11722/code/CG/PA1/code/src/object3d.hpp
+/mnt/c/Users/11722/code/CG/PPM/code/src/object3d.hpp
 group.hpp
-/mnt/c/Users/11722/code/CG/PA1/code/src/group.hpp
+/mnt/c/Users/11722/code/CG/PPM/code/src/group.hpp
 mesh.hpp
-/mnt/c/Users/11722/code/CG/PA1/code/src/mesh.hpp
+/mnt/c/Users/11722/code/CG/PPM/code/src/mesh.hpp
 sphere.hpp
-/mnt/c/Users/11722/code/CG/PA1/code/src/sphere.hpp
+/mnt/c/Users/11722/code/CG/PPM/code/src/sphere.hpp
 plane.hpp
-/mnt/c/Users/11722/code/CG/PA1/code/src/plane.hpp
+/mnt/c/Users/11722/code/CG/PPM/code/src/plane.hpp
 triangle.hpp
-/mnt/c/Users/11722/code/CG/PA1/code/src/triangle.hpp
+/mnt/c/Users/11722/code/CG/PPM/code/src/triangle.hpp
 transform.hpp
-/mnt/c/Users/11722/code/CG/PA1/code/src/transform.hpp
+/mnt/c/Users/11722/code/CG/PPM/code/src/transform.hpp
+curve.hpp
+/mnt/c/Users/11722/code/CG/PPM/code/src/curve.hpp
+revsurface.hpp
+/mnt/c/Users/11722/code/CG/PPM/code/src/revsurface.hpp
 

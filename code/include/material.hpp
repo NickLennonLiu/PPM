@@ -3,7 +3,7 @@
 
 #include <cassert>
 #include <vecmath.h>
-
+#include <iostream>
 #include "ray.hpp"
 #include "hit.hpp"
 
@@ -21,11 +21,16 @@ public:
         return diffuseColor;
     }
 
+    float getShininess() const {
+        return shininess;
+    }
+
 
     Vector3f Shade(const Ray &ray, const Hit &hit,
                    const Vector3f &dirToLight, const Vector3f &lightColor) {
         Vector3f shaded = Vector3f::ZERO;
         Vector3f Ri = 2.0 * Vector3f::dot(dirToLight, hit.getNormal()) * hit.getNormal() - dirToLight;
+        
         shaded += lightColor * 
                 (diffuseColor * clamp(Vector3f::dot(dirToLight, hit.getNormal())) + 
                  specularColor * pow(clamp(Vector3f::dot(-(ray.getDirection().normalized()), Ri.normalized())), shininess));

@@ -50,9 +50,7 @@ int main(int argc, char *argv[]) {
                 {
                     Light* light = parser.getLight(li);
                     Vector3f L, LightColor;
-
                     light->getIllumination(camRay.pointAtParameter(hit.getT()), L, LightColor);
-
                     finalColor += hit.getMaterial()->Shade(camRay, hit, L, LightColor);
                 }
                 img.SetPixel(x, y, finalColor);

@@ -140,7 +140,6 @@ protected:
     std::vector<CurvePoint> samplePoints;
 public:
     explicit Curve(std::vector<Vector3f> points) : controls(std::move(points)) {
-        discretize(30, samplePoints); // 在初始化的时候即计算离散点
     }
 
     bool intersect(const Ray &r, Hit &h, float tmin) override {
@@ -184,6 +183,7 @@ public:
             printf("Number of control points of BezierCurve must be 3n+1!\n");
             exit(0);
         }
+        discretize(30, samplePoints); // 在初始化的时候即计算离散点
     }
 
     void discretize(int resolution, std::vector<CurvePoint>& data) override {
@@ -223,6 +223,7 @@ public:
             printf("Number of control points of BspineCurve must be more than 4!\n");
             exit(0);
         }
+        discretize(30, samplePoints); // 在初始化的时候即计算离散点
     }
 
     void discretize(int resolution, std::vector<CurvePoint>& data) override {
