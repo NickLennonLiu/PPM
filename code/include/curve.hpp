@@ -13,12 +13,13 @@
 class Bernstein
 {
     int n, k;
-    vector<double> t;
-    vector<double> tpad;
+    std::vector<double> t;
+    std::vector<double> tpad;
+
 public:
     // n阶 k次 节点矢量序列t
-    Bernstein(int nn, int kk, vector<double> knot)
-    : n(nn+1), k(kk), t(knot)
+    Bernstein(int nn, int kk, std::vector<double> knot)
+        : n(nn + 1), k(kk), t(knot)
     {
         tpad = t;
         for(int i = 0; i < k; ++i)
@@ -26,17 +27,17 @@ public:
     }
 
     // 当n=k, t0=...=tn=0, tn+1=...=t2n+1=1时，是一个次数为n控制顶点数为n+1的Bezier
-    static vector<double> bezier_knot(int k)
+    static std::vector<double> bezier_knot(int k)
     {
-        vector<double> re = vector<double>(k+1, 0);
+        std::vector<double> re = std::vector<double>(k + 1, 0);
         for(int i = 0; i < k+1; ++i)
             re.push_back(1);
         return re;  
     }
 
-    static vector<double> tknots(int n, int k)
+    static std::vector<double> tknots(int n, int k)
     {
-        vector<double> knots;
+        std::vector<double> knots;
         for(int i = 0; i <= n+k+1; ++i)
             knots.push_back(i * 1.0 / (n+k+1));
         return knots;
@@ -54,7 +55,7 @@ public:
         else
         {
             bpos = (lower_bound(t.begin(), t.end(), mu) - t.begin()) - 1;
-            bpos = max(0, bpos);
+            bpos = std::max(0, bpos);
         }
         return bpos;
     }
@@ -72,13 +73,13 @@ public:
         return t[n];
     }
 
-    int evalute(double mu, vector<double>& s, vector<double>& ds)
+    int evalute(double mu, std::vector<double> &s, std::vector<double> &ds)
     {
         int bpos = get_bpos(mu);
-        s = vector<double>(k+2, 0);
+        s = std::vector<double>(k + 2, 0);
         s[k] = 1;
 
-        ds = vector<double>(k+1, 1);
+        ds = std::vector<double>(k + 1, 1);
         for(int p = 1; p <= k; ++p)
         {
             for(int ii = k-p; ii <= k; ++ii)
@@ -110,13 +111,13 @@ public:
         int rsk = n - bpos - 1;
         if(lsk < 0)
         {
-            s = vector<double>(s.begin() - lsk, s.end());
-            ds = vector<double>(ds.begin() - lsk, ds.end());
+            s = std::vector<double>(s.begin() - lsk, s.end());
+            ds = std::vector<double>(ds.begin() - lsk, ds.end());
             lsk = 0;
         }
         if(rsk < 0) {
-            s = vector<double>(s.begin(), s.end() + rsk);
-            ds = vector<double>(ds.begin(), ds.end() + rsk);
+            s = std::vector<double>(s.begin(), s.end() + rsk);
+            ds = std::vector<double>(ds.begin(), ds.end() + rsk);
         }
 
         return lsk;
@@ -136,8 +137,11 @@ struct CurvePoint {
 class Curve : public Object3D {
 protected:
     std::vector<Vector3f> controls;
+    std::vector<CurvePoint> samplePoints;
 public:
-    explicit Curve(std::vector<Vector3f> points) : controls(std::move(points)) {}
+    explicit Curve(std::vector<Vector3f> points) : controls(std::move(points)) {
+        discretize(30, samplePoints); // 在初始化的时候即计算离散点
+    }
 
     bool intersect(const Ray &r, Hit &h, float tmin) override {
         return false;
@@ -188,11 +192,11 @@ public:
         // resolution: 每一小段[ti, ti_1)中等距采样的点的个数
         int n = controls.size() - 1;
         int k = n;
-        vector<double> knots = Bernstein::bezier_knot(k);
+        std::vector<double> knots = Bernstein::bezier_knot(k);
         Bernstein bezier = Bernstein(n, k, knots);
         double start = bezier.vstart(), end = bezier.vend();
         double step = (end - start) / (n+1 - k) / resolution;
-        vector<double> s, ds;
+        std::vector<double> s, ds;
         while(start < end)
         {
             int lsk = bezier.evalute(start, s, ds);
@@ -225,11 +229,11 @@ public:
         data.clear();
         // TODO (PA3): fill in data vector
         int n = controls.size() - 1, k = 3;
-        vector<double> knots = Bernstein::tknots(n, k);
+        std::vector<double> knots = Bernstein::tknots(n, k);
         Bernstein bspline = Bernstein(n, k, knots);
         double start = bspline.vstart(), end = bspline.vend();
         double step = (end - start) / (n + 1 - k) / resolution;
-        vector<double> s, ds;
+        std::vector<double> s, ds;
         while (start < end)
         {
             int lsk = bspline.evalute(start, s, ds);
