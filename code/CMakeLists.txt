@@ -28,6 +28,9 @@ SET(PA1_INCLUDES
         include/sphere.hpp
         include/transform.hpp
         include/triangle.hpp
+        include/aabb.hpp
+        include/curve.hpp
+        include/revsurface.hpp
         )
 
 SET(CMAKE_CXX_STANDARD 11)
