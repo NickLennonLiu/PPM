@@ -23,6 +23,8 @@
 #include "bbox.hpp"
 #include "material.hpp"
 #include "halton.hpp"
+#include "group.hpp"
+#include "image.hpp"
 
 #define PHOTON_COUNT_MUTIPLIER 1000
 
@@ -41,6 +43,8 @@ namespace /* anonymous */
     std::vector<std::list<HitRecord *>> hash_grid;
     double hash_s;
     BoundingBox hpbbox;
+    Group* group;
+    /*
     Sphere sph[] =
         {
             // Scene: radius, position, color, material
@@ -54,6 +58,7 @@ namespace /* anonymous */
             Sphere(Vector3f(73, 16.5, 88), 16.5, Material::Glass),         //Glass
             Sphere(Vector3f(50, 8.5, 60), 8.5, Material::Matte),           //Middle
     };
+    */
 
 } // namespace
 
@@ -136,8 +141,10 @@ void build_hash_grid(
 //-------------------------------------------------------------------------------------------
 //      交差判定を行います.
 //-------------------------------------------------------------------------------------------
+/*   使用框架中的相交
 inline bool intersect(const Ray &r, double &t, int &id)
 {
+
     int n = sizeof(sph) / sizeof(sph[0]);
     auto d = D_INF;
     t = D_INF;
@@ -153,6 +160,7 @@ inline bool intersect(const Ray &r, double &t, int &id)
 
     return (t < D_INF);
 }
+*/
 
 //-------------------------------------------------------------------------------------------
 //      フォトンレイを生成します.
@@ -176,18 +184,22 @@ void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &ad
 {
     double t;
     int id;
-
+    Hit h;
     dpt++;
-    if (!intersect(r, t, id) || (dpt >= 20))
+    if (!group->intersect(r, h, 0) || (dpt >= 20))
         return;
 
     //TODO:change only sphere to all other objects
     auto d3 = dpt * 3;
-    const auto &obj = sph[id];
-    auto x = r.getOrigin() + r.getDirection() * t, n = (x - obj.pos).normal;
-    auto f = obj.color;
-    auto nl = (dot(n, r.getDirection()) < 0) ? n : n * -1;
-    auto p = (f.x > f.y && f.x > f.z) ? f.x : (f.y > f.z) ? f.y : f.z;
+    //const auto &obj = sph[id];
+
+    //auto x = r.getOrigin() + r.getDirection() * t, n = (x - obj.pos).normal;    
+    auto x = r.pointAtParameter(h.getT()), n = h.getNormal();
+    //auto f = obj.color;
+    auto material = h.getMaterial();
+    auto f = material->getDiffuseColor();
+    auto nl = ((Vector3f::dot(r.getDirection(), n)) < 0) ? n : n * -1;
+    auto p = (f.x() > f.y() && f.x() > f.z()) ? f.x() : (f.y() > f.z()) ? f.y() : f.z();
 
     if (obj.type == Material::Matte)
     {
@@ -196,7 +208,7 @@ void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &ad
             // eye ray
             // store the measurment point
             auto hp = new HitRecord;
-            hp->f = mul(f, adj);
+            hp->f = f * adj;
             hp->pos = x;
             hp->nrm = n;
             hp->idx = i;
@@ -210,27 +222,27 @@ void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &ad
             // photon ray
             // find neighboring measurement points and accumulate flux via progressive density estimation
             auto hh = (x - hpbbox.mini) * hash_s;
-            auto ix = abs(int(hh.x));
-            auto iy = abs(int(hh.y));
-            auto iz = abs(int(hh.z));
+            auto ix = abs(int(hh.x()));
+            auto iy = abs(int(hh.y()));
+            auto iz = abs(int(hh.z()));
             // strictly speaking, we should use #pragma omp critical here.
             // it usually works without an artifact due to the fact that photons are
             // rarely accumulated to the same measurement points at the same time (especially with QMC).
             // it is also significantly faster.
             {
-                auto list = hash_grid[hash(ix, iy, iz)];
+                auto list = hash_grid[get_hash(ix, iy, iz)];
                 for (auto itr = list.begin(); itr != list.end(); itr++)
                 {
                     auto hp = (*itr);
                     auto v = hp->pos - x;
                     // check normals to be closer than 90 degree (avoids some edge brightning)
-                    if ((dot(hp->nrm, n) > 1e-3) && (dot(v, v) <= hp->r2))
+                    if ((Vector3f::dot(hp->nrm, n) > 1e-3) && (Vector3f::dot(v, v) <= hp->r2))
                     {
                         // unlike N in the paper, hp->n stores "N / ALPHA" to make it an integer value
                         auto g = (hp->n * ALPHA + ALPHA) / (hp->n * ALPHA + 1.0);
                         hp->r2 = hp->r2 * g;
                         hp->n++;
-                        hp->flux = (hp->flux + mul(hp->f, fl) / D_PI) * g;
+                        hp->flux = (hp->flux + (hp->f *  fl) / D_PI) * g;
                     }
                 }
             }
@@ -240,42 +252,42 @@ void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &ad
             auto r2 = halton(d3 + 0, i);
             auto r2s = sqrt(r2);
             auto w = nl;
-            auto u = normalize(cross((fabs(w.x) > .1 ? Vector3f(0, 1, 0) : Vector3f(1, 0, 0)), w));
-            auto v = cross(w, u);
-            auto d = normalize(u * cos(r1) * r2s + v * sin(r1) * r2s + w * sqrt(1 - r2));
+            auto u = (Vector3f::cross((fabs(w.x()) > .1 ? Vector3f(0, 1, 0) : Vector3f(1, 0, 0)), w)).normalized();
+            auto v = Vector3f::cross(w, u);
+            auto d = (u * cos(r1) * r2s + v * sin(r1) * r2s + w * sqrt(1 - r2)).normalized();
 
             if (halton(d3 + 1, i) < p)
-                trace(Ray(x, d), dpt, m, mul(f, fl) * (1. / p), mul(f, adj), i);
+                trace(Ray(x, d), dpt, m, (f * fl) * (1. / p), (f * adj), i);
         }
     }
     else if (obj.type == Material::Mirror)
     {
-        trace(Ray(x, reflect(r.getDirection(), n)), dpt, m, mul(f, fl), mul(f, adj), i);
+        trace(Ray(x, Vector3f::reflect(r.getDirection(), n)), dpt, m, (f * fl), (f * adj), i);
     }
     else
     {
-        Ray lr(x, reflect(r.getDirection(), n));
-        auto into = dot(n, nl) > 0.0;
+        Ray lr(x, Vector3f::reflect(r.getDirection(), n));
+        auto into = Vector3f::dot(n, nl) > 0.0;
         auto nc = 1.0;
         auto nt = 1.5;
         auto nnt = (into) ? nc / nt : nt / nc;
-        auto ddn = dot(r.getDirection(), nl);
+        auto ddn = Vector3f::dot(r.getDirection(), nl);
         auto cos2t = 1 - nnt * nnt * (1 - ddn * ddn);
 
         // total internal reflection
         if (cos2t < 0)
-            return trace(lr, dpt, m, mul(f, fl), mul(f, adj), i);
+            return trace(lr, dpt, m, (f * fl), (f * adj), i);
 
-        auto td = normalize(r.getDirection() * nnt - n * ((into ? 1 : -1) * (ddn * nnt + sqrt(cos2t))));
+        auto td = (r.getDirection() * nnt - n * ((into ? 1 : -1) * (ddn * nnt + sqrt(cos2t)))).normalized();
         auto a = nt - nc;
         auto b = nt + nc;
         auto R0 = a * a / (b * b);
-        auto c = 1 - (into ? -ddn : dot(td, n));
+        auto c = 1 - (into ? -ddn : Vector3f::dot(td, n));
         auto Re = R0 + (1 - R0) * c * c * c * c * c;
         auto P = Re;
         Ray rr(x, td);
-        auto fa = mul(f, adj);
-        auto ffl = mul(f, fl);
+        auto fa = f * adj;
+        auto ffl = f * fl;
 
         if (m)
         {
@@ -303,9 +315,9 @@ void trace_ray(int w, int h)
     // trace eye rays and store measurement points
     Ray cam(
         Vector3f(50, 48, 295.6),
-        normalize(Vector3f(0, -0.042612, -1)));
+        Vector3f(0, -0.042612, -1).normalized());
     auto cx = Vector3f(w * 0.5135 / h, 0, 0);
-    auto cy = normalize(cross(cx, cam.getDirection())) * 0.5135;
+    auto cy = (Vector3f::cross(cx, cam.getDirection())).normalized() * 0.5135;
 
     for (int y = 0; y < h; y++)
     {
@@ -315,7 +327,7 @@ void trace_ray(int w, int h)
         {
             auto idx = x + y * w;
             auto d = cx * ((x + 0.5) / w - 0.5) + cy * (-(y + 0.5) / h + 0.5) + cam.getDirection();
-            trace(Ray(cam.getOrigin() + d * 140, normalize(d)), 0, true, Vector3f(), Vector3f(1, 1, 1), idx);
+            trace(Ray(cam.getOrigin() + d * 140, d.normalized()), 0, true, Vector3f(), Vector3f(1, 1, 1), idx);
         }
     }
     fprintf(stdout, "\n");
@@ -350,12 +362,12 @@ void trace_photon(int s)
         auto p = 100.0 * (i + 1) / s;
         fprintf(stdout, "\rPhotonPass %5.2f%%", p);
         int m = PHOTON_COUNT_MUTIPLIER * i;
-        Ray r;
+        Ray *r;
         Vector3f f;
         for (int j = 0; j < PHOTON_COUNT_MUTIPLIER; j++)
         {
-            genp(&r, &f, m + j);
-            trace(r, 0, false, f, vw, m + j);
+            genp(r, &f, m + j);
+            trace(*r, 0, false, f, vw, m + j);
         }
     }
 
@@ -383,13 +395,13 @@ void density_estimation(Vector3f *color, int num_photon)
 //-------------------------------------------------------------------------------------------
 //      メインエントリーポイントです.
 //-------------------------------------------------------------------------------------------
-int main(int argc, char **argv)
+int main(int argc, char **argv, int w, int h, int s, Image* img, Group* _group)
 {
-    auto w = 1280;  // 画像の横幅.
-    auto h = 1080;  // 画像の縦幅.
-    auto s = 10000; // s * 1000 photon paths will be traced (s * PHOTON_COUNT_MULTIPLIER).
+    //auto w = 1280;  // 画像の横幅.
+    //auto h = 1080;  // 画像の縦幅.
+    //auto s = 10000; // s * 1000 photon paths will be traced (s * PHOTON_COUNT_MULTIPLIER).
     auto c = new Vector3f[w * h];
-
+    group = _group;
     hpbbox.reset();
 
     trace_ray(w, h);
@@ -397,7 +409,11 @@ int main(int argc, char **argv)
     density_estimation(c, s);
 
     const auto kGamma = 2.2;
-    save_to_bmp("image.bmp", w, h, &c[0].x, kGamma);
+    // TODO(edit Image.SetPixel() to have gamma argument)
+    //save_to_bmp("image.bmp", w, h, &c[0].x, kGamma);
+
+    for(int i = 0; i < (w*h); ++i)    // idx = x + y * w
+        img->SetPixel(i % w, i / w, c[i]);
 
     delete[] c;
     c = nullptr;

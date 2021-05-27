@@ -244,6 +244,15 @@ Vector3f Vector3f::cross( const Vector3f& v0, const Vector3f& v1 )
         );
 }
 
+Vector3f Vector3f::reflect(const Vector3f &a, const Vector3f &b)
+{
+	auto dot = a.x() * b.x() + a.y() * b.y() + a.z() * b.z();
+	return Vector3f(
+		a.x() - 2.0 * dot * b.x(),
+		a.y() - 2.0 * dot * b.y(),
+		a.z() - 2.0 * dot * b.z());
+}
+
 // static
 Vector3f Vector3f::lerp( const Vector3f& v0, const Vector3f& v1, float alpha )
 {
