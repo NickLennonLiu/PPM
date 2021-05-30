@@ -11,6 +11,10 @@ public:
     virtual ~Light() = default;
 
     virtual void getIllumination(const Vector3f &p, Vector3f &dir, Vector3f &col) const = 0;
+
+    Vector3f direction;
+    Vector3f color;
+    Vector3f position;
 };
 
 
@@ -34,11 +38,6 @@ public:
         col = color;
     }
 
-private:
-
-    Vector3f direction;
-    Vector3f color;
-
 };
 
 class PointLight : public Light {
@@ -59,11 +58,6 @@ public:
         dir = dir / dir.length();
         col = color;
     }
-
-private:
-
-    Vector3f position;
-    Vector3f color;
 
 };
 

@@ -26,7 +26,7 @@
 #include "group.hpp"
 #include "image.hpp"
 
-#define PHOTON_COUNT_MUTIPLIER 10
+#define PHOTON_COUNT_MUTIPLIER 1000
 
 namespace /* anonymous */
 {
@@ -44,6 +44,7 @@ namespace /* anonymous */
     double hash_s;
     BoundingBox hpbbox;
     Group* group;
+    SceneParser* parser;
     /*
     Sphere sph[] =
         {
@@ -82,7 +83,7 @@ void build_hash_grid(
 {
     // heuristic for initial radius
     auto size = hpbbox.maxi - hpbbox.mini;
-    auto irad = ((size.x() + size.y() + size.z()) / 3.0) / ((w + h) / 2.0) * 2.0;
+    auto irad = ((size.x() + size.y() + size.z()) / 3.0) / ((w + h) / 2.0) * 100.0;
 
     // determine hash table size
     // we now find the bounding box of all the measurement points inflated by the initial radius
@@ -107,7 +108,6 @@ void build_hash_grid(
     hash_grid.resize(photon_count);
     cout << hash_grid.size() << " --- size" << endl;
     hash_grid.shrink_to_fit();
-    cout << hash_grid.size() << " --- size" << endl;
     for (auto itr = hitpoints.begin(); itr != hitpoints.end(); ++itr)
     {
         auto hp = (*itr);
@@ -164,15 +164,14 @@ inline bool intersect(const Ray &r, double &t, int &id)
 //-------------------------------------------------------------------------------------------
 //      フォトンレイを生成します.
 //-------------------------------------------------------------------------------------------
-void genp(Ray &pr, Vector3f *f, int i)
+void genp(Ray &pr, Vector3f *f, int i, Light* light)
 {
     // generate a photon ray from the point light source with QMC
     (*f) = Vector3f(100, 100, 100) * (D_PI * 4.0); // flux
     auto p = 2.0 * D_PI * halton(0, i);
     auto t = 2.0 * acos(sqrt(1. - halton(1, i)));
     auto st = sin(t);
-
-    pr = Ray(Vector3f(0, 5, 0), Vector3f(cos(p) * st, cos(t), sin(p) * st));
+    pr = Ray(light->position, Vector3f(cos(p) * st, cos(t), sin(p) * st));
 }
 
 //-------------------------------------------------------------------------------------------
@@ -197,11 +196,11 @@ void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &ad
     auto x = r.pointAtParameter(h.getT()), n = h.getNormal();
     //auto f = obj.color;
     auto material = h.getMaterial();
-    auto f = material->getDiffuseColor();
+    auto f = material->getColor();
     auto nl = ((Vector3f::dot(r.getDirection(), n)) < 0) ? n : n * -1;
     auto p = (f.x() > f.y() && f.x() > f.z()) ? f.x() : (f.y() > f.z()) ? f.y() : f.z();
 
-    if (material->type == 0) // Matte
+    if (material->getType() == 0) // Matte
     {
         if (m)
         {
@@ -226,7 +225,6 @@ void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &ad
             auto iy = abs(int(hh.y()));
             auto iz = abs(int(hh.z()));
             // strictly speaking, we should use #pragma omp critical here.
-#pragma omp critical
             // it usually works without an artifact due to the fact that photons are
             // rarely accumulated to the same measurement points at the same time (especially with QMC).
             // it is also significantly faster.
@@ -261,7 +259,7 @@ void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &ad
                 trace(Ray(x, d), dpt, m, (f * fl) * (1. / p), (f * adj), i, depth+1);
         }
     }
-    else if (material->type == 1) // Mirror
+    else if (material->getType() == 1) // Mirror
     {
         trace(Ray(x, Vector3f::reflect(r.getDirection(), n)), dpt, m, (f * fl), (f * adj), i, depth+1);
     }
@@ -364,10 +362,15 @@ void trace_photon(int s)
         int m = PHOTON_COUNT_MUTIPLIER * i;
         Ray r({0,0,0}, {0,0,0});
         Vector3f f;
+
         for (int j = 0; j < PHOTON_COUNT_MUTIPLIER; j++)
         {
-            genp(r, &f, m + j);
-            trace(r, 0, false, f, vw, m + j, 0);
+            for (int li = 0; li < parser->getNumLights(); ++li)
+            {
+                genp(r, &f, m + j, parser->getLight(li));
+                trace(r, 0, false, f, vw, m + j, 0);
+            }
+            
         }
     }
 
@@ -395,16 +398,16 @@ void density_estimation(Vector3f *color, int num_photon)
 //-------------------------------------------------------------------------------------------
 //      メインエントリーポイントです.
 //-------------------------------------------------------------------------------------------
-int ppm(int w, int h, int s, Image* img, Group* _group, Camera* camera)
+int ppm(int w, int h, int s, Image* img, SceneParser* _parser)
 {
     //auto w = 1280;  // 画像の横幅.
     //auto h = 1080;  // 画像の縦幅.
     //auto s = 10000; // s * 1000 photon paths will be traced (s * PHOTON_COUNT_MULTIPLIER).
     auto c = new Vector3f[w * h];
-    group = _group;
+    group = _parser->getGroup();
     hpbbox.reset();
-
-    trace_ray(w, h, camera);
+    parser = _parser;
+    trace_ray(w, h, _parser->getCamera());
     trace_photon(s);
     density_estimation(c, s);
 

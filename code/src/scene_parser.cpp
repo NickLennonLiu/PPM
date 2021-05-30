@@ -245,12 +245,13 @@ Material *SceneParser::parseMaterial() {
     char token[MAX_PARSER_TOKEN_LENGTH];
     char filename[MAX_PARSER_TOKEN_LENGTH];
     filename[0] = 0;
-    Vector3f diffuseColor(1, 1, 1), specularColor(0, 0, 0);
-    float shininess = 0;
+    Vector3f Color(1, 1, 1);
+    int type = 0;
     getToken(token);
     assert (!strcmp(token, "{"));
     while (true) {
         getToken(token);
+        /*
         if (strcmp(token, "diffuseColor") == 0) {
             diffuseColor = readVector3f();
         } else if (strcmp(token, "specularColor") == 0) {
@@ -260,12 +261,18 @@ Material *SceneParser::parseMaterial() {
         } else if (strcmp(token, "texture") == 0) {
             // Optional: read in texture and draw it.
             getToken(filename);
-        } else {
+        } 
+        */
+       if (strcmp(token, "Color") == 0) {
+           Color = readVector3f();
+       } else if (strcmp(token, "type") == 0) {
+           type = readInt();
+       } else {
             assert (!strcmp(token, "}"));
             break;
         }
     }
-    auto *answer = new Material(diffuseColor, specularColor, shininess);
+    auto *answer = new Material(Color, type);
     return answer;
 }
 
