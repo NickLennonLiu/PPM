@@ -25,13 +25,14 @@ public:
 
     int getWidth() const { return width; }
     int getHeight() const { return height; }
-
-protected:
     // Extrinsic parameters
     Vector3f center;
     Vector3f direction;
     Vector3f up;
     Vector3f horizontal;
+
+protected:
+    
     // Intrinsic parameters
     int width;
     int height;

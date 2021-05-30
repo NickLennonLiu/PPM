@@ -22,13 +22,14 @@ public:
     , radius(radius)
     {
         gen_box();
+        
     }
 
     ~Sphere() override = default;
 
     bool intersect(const Ray &r, Hit &h, float tmin) override {
-        bool re = box.intersect(r, h, tmin);
-        return re;
+        //bool re = box.intersect(r, h, tmin);
+        //return re;
         Vector3f dir = r.getDirection().normalized();
         Vector3f l = (center - r.getOrigin());      // 球心与视线来源的连线
         float l2 = l.squaredLength();

@@ -4,13 +4,13 @@
 if [[ ! -d build ]]; then
     mkdir -p build
     cd build
-    cmake ..
+    cmake -DCMAKE_BUILD_TYPE=Debug ..
     cd ..
 else
     # rm -r build
     # mkdir -p build
     cd build
-    cmake ..
+    cmake -DCMAKE_BUILD_TYPE=Debug ..
     cd ..
 fi
 

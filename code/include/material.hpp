@@ -10,8 +10,8 @@
 class Material {
 public:
 
-    explicit Material(const Vector3f &d_color, const Vector3f &s_color = Vector3f::ZERO, float s = 0) :
-            diffuseColor(d_color), specularColor(s_color), shininess(s) {
+    explicit Material(const Vector3f &d_color, const Vector3f &s_color = Vector3f::ZERO, float s = 0, int t = 0) :
+            diffuseColor(d_color), specularColor(s_color), shininess(s), type(t) {
 
     }
 
@@ -37,10 +37,13 @@ public:
         return shaded;
     }
 
+    int type; // 0: Matte 1: Mirror, 2: Glass
+
 protected:
     Vector3f diffuseColor;
     Vector3f specularColor;
     float shininess;
+    
 
     inline float clamp(float x)
     {

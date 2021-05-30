@@ -20,15 +20,22 @@ CMakeFiles/PA1.dir/src/main.cpp.o: ../deps/vecmath/include/Vector2f.h
 CMakeFiles/PA1.dir/src/main.cpp.o: ../deps/vecmath/include/Vector3f.h
 CMakeFiles/PA1.dir/src/main.cpp.o: ../deps/vecmath/include/Vector4f.h
 CMakeFiles/PA1.dir/src/main.cpp.o: ../deps/vecmath/include/vecmath.h
+CMakeFiles/PA1.dir/src/main.cpp.o: ../include/aabb.hpp
+CMakeFiles/PA1.dir/src/main.cpp.o: ../include/bbox.hpp
 CMakeFiles/PA1.dir/src/main.cpp.o: ../include/camera.hpp
 CMakeFiles/PA1.dir/src/main.cpp.o: ../include/group.hpp
+CMakeFiles/PA1.dir/src/main.cpp.o: ../include/halton.hpp
 CMakeFiles/PA1.dir/src/main.cpp.o: ../include/hit.hpp
+CMakeFiles/PA1.dir/src/main.cpp.o: ../include/hitrecord.hpp
 CMakeFiles/PA1.dir/src/main.cpp.o: ../include/image.hpp
 CMakeFiles/PA1.dir/src/main.cpp.o: ../include/light.hpp
 CMakeFiles/PA1.dir/src/main.cpp.o: ../include/material.hpp
 CMakeFiles/PA1.dir/src/main.cpp.o: ../include/object3d.hpp
+CMakeFiles/PA1.dir/src/main.cpp.o: ../include/plane.hpp
+CMakeFiles/PA1.dir/src/main.cpp.o: ../include/ppm.hpp
 CMakeFiles/PA1.dir/src/main.cpp.o: ../include/ray.hpp
 CMakeFiles/PA1.dir/src/main.cpp.o: ../include/scene_parser.hpp
+CMakeFiles/PA1.dir/src/main.cpp.o: ../include/sphere.hpp
 CMakeFiles/PA1.dir/src/main.cpp.o: ../src/main.cpp
 
 CMakeFiles/PA1.dir/src/mesh.cpp.o: ../deps/vecmath/include/Matrix2f.h

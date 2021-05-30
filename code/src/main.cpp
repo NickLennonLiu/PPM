@@ -10,6 +10,7 @@
 #include "camera.hpp"
 #include "group.hpp"
 #include "light.hpp"
+#include "ppm.hpp"
 
 #include <string>
 
@@ -37,6 +38,8 @@ int main(int argc, char *argv[]) {
     int w = parser.getCamera()->getWidth(), 
         h = parser.getCamera()->getHeight();
     Image img(w, h);
+    ppm(w, h, 100, &img, parser.getGroup(), parser.getCamera());
+    /*
     for (int x = 0; x < w; ++x) {
         for (int y = 0; y < h; ++y) {
             Ray camRay = parser.getCamera()->generateRay(Vector2f(x, y));
@@ -59,6 +62,7 @@ int main(int argc, char *argv[]) {
             }
         }
     }
+    */
     img.SaveImage(outputFile.c_str());
     cout << "Hello! Computer Graphics!" << endl;
     return 0;

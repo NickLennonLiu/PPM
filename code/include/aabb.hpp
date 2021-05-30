@@ -10,10 +10,11 @@
 #include "plane.hpp"
 using namespace std;
 
+const float dir[3][3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
 
 class AABB : public Object3D
 {
-    static float dir[3][3];
+    //static float dir[3][3];
     // 3个平面确定一个包围盒
     float axis_planes[3][2]; // 0:x, 1:y, 2:z // 0: min, 1: max
 public:
@@ -92,6 +93,6 @@ protected:
     }
 };
 
-float AABB::dir[3][3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
+
 
 #endif // AABB_HPP

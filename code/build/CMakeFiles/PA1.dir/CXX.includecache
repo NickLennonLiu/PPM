@@ -62,6 +62,10 @@ iostream
 plane.hpp
 ../include/plane.hpp
 
+../include/bbox.hpp
+vecmath.h
+-
+
 ../include/camera.hpp
 ray.hpp
 ../include/ray.hpp
@@ -94,11 +98,17 @@ hit.hpp
 vector
 -
 
+../include/halton.hpp
+
 ../include/hit.hpp
 vecmath.h
 -
 ray.hpp
 ../include/ray.hpp
+
+../include/hitrecord.hpp
+vecmath.h
+-
 
 ../include/image.hpp
 cassert
@@ -151,6 +161,34 @@ vecmath.h
 -
 cmath
 -
+
+../include/ppm.hpp
+cmath
+-
+cstdlib
+-
+cstdio
+-
+list
+-
+vector
+-
+chrono
+-
+hitrecord.hpp
+../include/hitrecord.hpp
+sphere.hpp
+../include/sphere.hpp
+bbox.hpp
+../include/bbox.hpp
+material.hpp
+../include/material.hpp
+halton.hpp
+../include/halton.hpp
+group.hpp
+../include/group.hpp
+image.hpp
+../include/image.hpp
 
 ../include/ray.hpp
 cassert
@@ -231,6 +269,8 @@ group.hpp
 /mnt/c/Users/11722/code/CG/PPM/code/src/group.hpp
 light.hpp
 /mnt/c/Users/11722/code/CG/PPM/code/src/light.hpp
+ppm.hpp
+/mnt/c/Users/11722/code/CG/PPM/code/src/ppm.hpp
 string
 -
 

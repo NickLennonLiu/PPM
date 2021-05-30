@@ -26,7 +26,7 @@
 #include "group.hpp"
 #include "image.hpp"
 
-#define PHOTON_COUNT_MUTIPLIER 1000
+#define PHOTON_COUNT_MUTIPLIER 10
 
 namespace /* anonymous */
 {
@@ -66,9 +66,7 @@ namespace /* anonymous */
 //      ハッシュキーを取得します.
 //-------------------------------------------------------------------------------------------
 inline unsigned int get_hash(
-    const int ix,
-    const int iy,
-    const int iz)
+    const int ix, const int iy, const int iz)
 {
     return (unsigned int)((ix * 73856093) ^
                           (iy * 19349663) ^
@@ -80,8 +78,7 @@ inline unsigned int get_hash(
 //      ハッシュグリッドを構築します.
 //-------------------------------------------------------------------------------------------
 void build_hash_grid(
-    const int w,
-    const int h)
+    const int w, const int h)
 {
     // heuristic for initial radius
     auto size = hpbbox.maxi - hpbbox.mini;
@@ -108,7 +105,9 @@ void build_hash_grid(
 
     // build the hash table
     hash_grid.resize(photon_count);
+    cout << hash_grid.size() << " --- size" << endl;
     hash_grid.shrink_to_fit();
+    cout << hash_grid.size() << " --- size" << endl;
     for (auto itr = hitpoints.begin(); itr != hitpoints.end(); ++itr)
     {
         auto hp = (*itr);
@@ -165,23 +164,24 @@ inline bool intersect(const Ray &r, double &t, int &id)
 //-------------------------------------------------------------------------------------------
 //      フォトンレイを生成します.
 //-------------------------------------------------------------------------------------------
-void genp(Ray *pr, Vector3f *f, int i)
+void genp(Ray &pr, Vector3f *f, int i)
 {
     // generate a photon ray from the point light source with QMC
-    (*f) = Vector3f(2500, 2500, 2500) * (D_PI * 4.0); // flux
+    (*f) = Vector3f(100, 100, 100) * (D_PI * 4.0); // flux
     auto p = 2.0 * D_PI * halton(0, i);
     auto t = 2.0 * acos(sqrt(1. - halton(1, i)));
     auto st = sin(t);
 
-    Ray re = Ray(Vector3f(50, 60, 85), Vector3f(cos(p) * st, cos(t), sin(p) * st));
-    pr = new Ray(std::move(re));
+    pr = Ray(Vector3f(0, 5, 0), Vector3f(cos(p) * st, cos(t), sin(p) * st));
 }
 
 //-------------------------------------------------------------------------------------------
 //      レイを追跡します.
 //-------------------------------------------------------------------------------------------
-void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &adj, int i)
+void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &adj, int i, int depth)
 {
+    if(depth > 5)
+        return;
     double t;
     int id;
     Hit h;
@@ -201,7 +201,7 @@ void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &ad
     auto nl = ((Vector3f::dot(r.getDirection(), n)) < 0) ? n : n * -1;
     auto p = (f.x() > f.y() && f.x() > f.z()) ? f.x() : (f.y() > f.z()) ? f.y() : f.z();
 
-    if (obj.type == Material::Matte)
+    if (material->type == 0) // Matte
     {
         if (m)
         {
@@ -226,6 +226,7 @@ void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &ad
             auto iy = abs(int(hh.y()));
             auto iz = abs(int(hh.z()));
             // strictly speaking, we should use #pragma omp critical here.
+#pragma omp critical
             // it usually works without an artifact due to the fact that photons are
             // rarely accumulated to the same measurement points at the same time (especially with QMC).
             // it is also significantly faster.
@@ -257,14 +258,14 @@ void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &ad
             auto d = (u * cos(r1) * r2s + v * sin(r1) * r2s + w * sqrt(1 - r2)).normalized();
 
             if (halton(d3 + 1, i) < p)
-                trace(Ray(x, d), dpt, m, (f * fl) * (1. / p), (f * adj), i);
+                trace(Ray(x, d), dpt, m, (f * fl) * (1. / p), (f * adj), i, depth+1);
         }
     }
-    else if (obj.type == Material::Mirror)
+    else if (material->type == 1) // Mirror
     {
-        trace(Ray(x, Vector3f::reflect(r.getDirection(), n)), dpt, m, (f * fl), (f * adj), i);
+        trace(Ray(x, Vector3f::reflect(r.getDirection(), n)), dpt, m, (f * fl), (f * adj), i, depth+1);
     }
-    else
+    else    // Glass
     {
         Ray lr(x, Vector3f::reflect(r.getDirection(), n));
         auto into = Vector3f::dot(n, nl) > 0.0;
@@ -276,7 +277,7 @@ void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &ad
 
         // total internal reflection
         if (cos2t < 0)
-            return trace(lr, dpt, m, (f * fl), (f * adj), i);
+            return trace(lr, dpt, m, (f * fl), (f * adj), i, depth+1);
 
         auto td = (r.getDirection() * nnt - n * ((into ? 1 : -1) * (ddn * nnt + sqrt(cos2t)))).normalized();
         auto a = nt - nc;
@@ -292,15 +293,15 @@ void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &ad
         if (m)
         {
             // eye ray (trace both rays)
-            trace(lr, dpt, m, ffl, fa * Re, i);
-            trace(rr, dpt, m, ffl, fa * (1.0 - Re), i);
+            trace(lr, dpt, m, ffl, fa * Re, i, depth+1);
+            trace(rr, dpt, m, ffl, fa * (1.0 - Re), i, depth+1);
         }
         else
         {
             // photon ray (pick one via Russian roulette)
             (halton(d3 - 1, i) < P)
-                ? trace(lr, dpt, m, ffl, fa * Re, i)
-                : trace(rr, dpt, m, ffl, fa * (1.0 - Re), i);
+                ? trace(lr, dpt, m, ffl, fa * Re, i, depth+1)
+                : trace(rr, dpt, m, ffl, fa * (1.0 - Re), i, depth+1);
         }
     }
 }
@@ -308,14 +309,14 @@ void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &ad
 //-------------------------------------------------------------------------------------------
 //      eye rayを追跡します.
 //-------------------------------------------------------------------------------------------
-void trace_ray(int w, int h)
+void trace_ray(int w, int h, Camera* camera)
 {
     auto start = std::chrono::system_clock::now();
 
     // trace eye rays and store measurement points
     Ray cam(
-        Vector3f(50, 48, 295.6),
-        Vector3f(0, -0.042612, -1).normalized());
+        camera->center,
+        camera->direction.normalized());
     auto cx = Vector3f(w * 0.5135 / h, 0, 0);
     auto cy = (Vector3f::cross(cx, cam.getDirection())).normalized() * 0.5135;
 
@@ -327,7 +328,7 @@ void trace_ray(int w, int h)
         {
             auto idx = x + y * w;
             auto d = cx * ((x + 0.5) / w - 0.5) + cy * (-(y + 0.5) / h + 0.5) + cam.getDirection();
-            trace(Ray(cam.getOrigin() + d * 140, d.normalized()), 0, true, Vector3f(), Vector3f(1, 1, 1), idx);
+            trace(Ray(cam.getOrigin() + d * 1, d.normalized()), 0, true, Vector3f(), Vector3f(1, 1, 1), idx, 0);
         }
     }
     fprintf(stdout, "\n");
@@ -343,7 +344,7 @@ void trace_ray(int w, int h)
 
     end = std::chrono::system_clock::now();
     dif = end - start;
-    fprintf(stdout, "Build Hash Grid : %lld(msec)\n", std::chrono::duration_cast<std::chrono::milliseconds>(dif).count());
+    fprintf(stdout, "Build Hash Grid: %lld(msec)\n", std::chrono::duration_cast<std::chrono::milliseconds>(dif).count());
 }
 
 //-------------------------------------------------------------------------------------------
@@ -355,19 +356,18 @@ void trace_photon(int s)
 
     // trace photon rays with multi-threading
     auto vw = Vector3f(1, 1, 1);
-
 #pragma omp parallel for schedule(dynamic, 1)
     for (int i = 0; i < s; i++)
     {
         auto p = 100.0 * (i + 1) / s;
         fprintf(stdout, "\rPhotonPass %5.2f%%", p);
         int m = PHOTON_COUNT_MUTIPLIER * i;
-        Ray *r;
+        Ray r({0,0,0}, {0,0,0});
         Vector3f f;
         for (int j = 0; j < PHOTON_COUNT_MUTIPLIER; j++)
         {
             genp(r, &f, m + j);
-            trace(*r, 0, false, f, vw, m + j);
+            trace(r, 0, false, f, vw, m + j, 0);
         }
     }
 
@@ -395,7 +395,7 @@ void density_estimation(Vector3f *color, int num_photon)
 //-------------------------------------------------------------------------------------------
 //      メインエントリーポイントです.
 //-------------------------------------------------------------------------------------------
-int main(int argc, char **argv, int w, int h, int s, Image* img, Group* _group)
+int ppm(int w, int h, int s, Image* img, Group* _group, Camera* camera)
 {
     //auto w = 1280;  // 画像の横幅.
     //auto h = 1080;  // 画像の縦幅.
@@ -404,7 +404,7 @@ int main(int argc, char **argv, int w, int h, int s, Image* img, Group* _group)
     group = _group;
     hpbbox.reset();
 
-    trace_ray(w, h);
+    trace_ray(w, h, camera);
     trace_photon(s);
     density_estimation(c, s);
 
