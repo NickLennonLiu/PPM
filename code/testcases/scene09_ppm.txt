@@ -22,13 +22,13 @@ Background {
 
 Materials {
     numMaterials 6
-    Material { Color 1 0 0 
+    Material { Color 0.8 0.2 0.1 
         type 0
     }
-    Material { Color 0 1 0 
+    Material { Color 0 0.7 0.3 
         type 0
     }
-    Material { Color 0 0 1 
+    Material { Color 0.2 0 0.6 
         type 0
     }
     Material { Color 0.8 0.8 0.8 
