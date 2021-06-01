@@ -26,7 +26,7 @@
 #include "group.hpp"
 #include "image.hpp"
 
-#define PHOTON_COUNT_MUTIPLIER 10000
+#define PHOTON_COUNT_MUTIPLIER 1000
 
 namespace /* anonymous */
 {
@@ -358,7 +358,7 @@ void trace_photon(int s)
     for (int i = 0; i < s; i++)
     {
         auto p = 100.0 * (i + 1) / s;
-        fprintf(stdout, "\rPhotonPass %5.2f%%\n", p);
+        fprintf(stdout, "\rPhotonPass %5.2f%%", p);
         int m = PHOTON_COUNT_MUTIPLIER * i;
         Ray r({0,0,0}, {0,0,0});
         Vector3f f;
