@@ -4,10 +4,10 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/mnt/c/Users/11722/code/CG/PPM/code/src/image.cpp" "/mnt/c/Users/11722/code/CG/PPM/code/build/CMakeFiles/PA1.dir/src/image.cpp.o"
-  "/mnt/c/Users/11722/code/CG/PPM/code/src/main.cpp" "/mnt/c/Users/11722/code/CG/PPM/code/build/CMakeFiles/PA1.dir/src/main.cpp.o"
-  "/mnt/c/Users/11722/code/CG/PPM/code/src/mesh.cpp" "/mnt/c/Users/11722/code/CG/PPM/code/build/CMakeFiles/PA1.dir/src/mesh.cpp.o"
-  "/mnt/c/Users/11722/code/CG/PPM/code/src/scene_parser.cpp" "/mnt/c/Users/11722/code/CG/PPM/code/build/CMakeFiles/PA1.dir/src/scene_parser.cpp.o"
+  "/root/CG_Final/code/src/image.cpp" "/root/CG_Final/code/build/CMakeFiles/PA1.dir/src/image.cpp.o"
+  "/root/CG_Final/code/src/main.cpp" "/root/CG_Final/code/build/CMakeFiles/PA1.dir/src/main.cpp.o"
+  "/root/CG_Final/code/src/mesh.cpp" "/root/CG_Final/code/build/CMakeFiles/PA1.dir/src/mesh.cpp.o"
+  "/root/CG_Final/code/src/scene_parser.cpp" "/root/CG_Final/code/build/CMakeFiles/PA1.dir/src/scene_parser.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
@@ -19,7 +19,7 @@ set(CMAKE_CXX_TARGET_INCLUDE_PATH
 
 # Targets to which this target links.
 set(CMAKE_TARGET_LINKED_INFO_FILES
-  "/mnt/c/Users/11722/code/CG/PPM/code/build/deps/vecmath/CMakeFiles/vecmath.dir/DependInfo.cmake"
+  "/root/CG_Final/code/build/deps/vecmath/CMakeFiles/vecmath.dir/DependInfo.cmake"
   )
 
 # Fortran module output directory.
