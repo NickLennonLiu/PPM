@@ -22,7 +22,8 @@ namespace /* anonymous */
 
 double halton(const int b, int j)
 {
-    const auto p = primes[b];
+    int bb = b % 61;
+    const auto p = primes[bb];
     auto h = 0.0;
     auto f = 1.0 / (double)p;
     auto fct = f;

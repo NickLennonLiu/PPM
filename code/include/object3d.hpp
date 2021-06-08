@@ -4,6 +4,7 @@
 #include "ray.hpp"
 #include "hit.hpp"
 #include "material.hpp"
+#include "aabb.hpp"
 
 // Base class for all 3d entities.
 class Object3D {
@@ -18,6 +19,10 @@ public:
 
     // Intersect Ray with this object. If hit, store information in hit structure.
     virtual bool intersect(const Ray &r, Hit &h, float tmin) = 0;
+
+    virtual AABB bbox() {
+        return AABB({{0,0},{0,0},{0,0}},this);
+    }
 protected:
 
     Material *material;

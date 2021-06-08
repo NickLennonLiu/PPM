@@ -27,6 +27,8 @@ cmath
 -
 
 ../deps/vecmath/include/Vector3f.h
+iostream
+-
 
 ../deps/vecmath/include/Vector4f.h
 

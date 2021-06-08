@@ -79,7 +79,7 @@ Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
         }
     }
     computeNormal();
-
+    
     f.close();
 }
 

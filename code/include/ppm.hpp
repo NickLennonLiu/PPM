@@ -45,6 +45,9 @@ namespace /* anonymous */
     BoundingBox hpbbox;
     Group* group;
     SceneParser* parser;
+    Image* _img;
+    int _w;
+    int unreach = 0;
     /*
     Sphere sph[] =
         {
@@ -83,7 +86,7 @@ void build_hash_grid(
 {
     // heuristic for initial radius
     auto size = hpbbox.maxi - hpbbox.mini;
-    auto irad = ((size.x() + size.y() + size.z()) / 3.0) / ((w + h) / 2.0) * 2.0;
+    auto irad = ((size.x() + size.y() + size.z()) / 3.0) / ((w + h) / 2.0) * 4.0;
 
     // determine hash table size
     // we now find the bounding box of all the measurement points inflated by the initial radius
@@ -105,7 +108,7 @@ void build_hash_grid(
     hash_s = 1.0 / (irad * 2.0);
 
     // build the hash table
-    hash_grid.resize(photon_count);
+    hash_grid.resize(photon_count * 3.5);
     cout << hash_grid.size() << " --- size" << endl;
     hash_grid.shrink_to_fit();
     for (auto itr = hitpoints.begin(); itr != hitpoints.end(); ++itr)
@@ -131,6 +134,7 @@ void build_hash_grid(
                 {
                     int hv = get_hash(ix, iy, iz);
                     hash_grid[hv].push_back(hp);
+                    
                 }
             }
         }
@@ -179,22 +183,17 @@ void genp(Ray &pr, Vector3f *f, int i, Light* light)
 //-------------------------------------------------------------------------------------------
 void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &adj, int i, int depth)
 {
-    if(depth > 5)
-        return;
     double t;
     int id;
     Hit h;
     dpt++;
-    if (!group->intersect(r, h, 0) || (dpt >= 20))
+    if (!group->intersect(r, h, 1e-3) || (dpt >= 20))
         return;
 
-    //TODO:change only sphere to all other objects
     auto d3 = dpt * 3;
-    //const auto &obj = sph[id];
 
     //auto x = r.getOrigin() + r.getDirection() * t, n = (x - obj.pos).normal;    
     auto x = r.pointAtParameter(h.getT()), n = h.getNormal();
-    //auto f = obj.color;
     auto material = h.getMaterial();
     auto f = material->getColor();
     auto nl = ((Vector3f::dot(r.getDirection(), n)) < 0) ? n : n * -1;
@@ -235,7 +234,7 @@ void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &ad
                     auto hp = (*itr);
                     auto v = hp->pos - x;
                     // check normals to be closer than 90 degree (avoids some edge brightning)
-                    if ((Vector3f::dot(hp->nrm, n) > 1e-3) && (Vector3f::dot(v, v) <= hp->r2))
+                    if ((Vector3f::dot(hp->nrm, n) > 1e-3) && (Vector3f::dot(v, v) <= (hp->r2)))
                     {
                         // unlike N in the paper, hp->n stores "N / ALPHA" to make it an integer value
                         auto g = (hp->n * ALPHA + ALPHA) / (hp->n * ALPHA + 1.0);
@@ -310,30 +309,30 @@ void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &ad
 void trace_ray(int w, int h, Camera* camera)
 {
     auto start = std::chrono::system_clock::now();
-
+    hitpoints.clear();
     // trace eye rays and store measurement points
     Ray cam(
         camera->center,
         camera->direction.normalized());
     auto cx = Vector3f(w * 0.5135 / h, 0, 0);
     auto cy = (Vector3f::cross(cx, cam.getDirection())).normalized() * 0.5135;
-
+    cout << w * h << endl;
     for (int y = 0; y < h; y++)
     {
-        fprintf(stdout, "\rHitPointPass %5.2f%%", 100.0 * y / (h - 1));
+        std::fprintf(stdout, "\rHitPointPass %5.2f%%", 100.0 * y / (h - 1));
 
         for (int x = 0; x < w; x++)
         {
-            auto idx = x + y * w;
+            auto idx = x + y * w;   
             auto d = cx * ((x + 0.5) / w - 0.5) + cy * (-(y + 0.5) / h + 0.5) + cam.getDirection();
             trace(Ray(cam.getOrigin() + d * 1, d.normalized()), 0, true, Vector3f(), Vector3f(1, 1, 1), idx, 0);
         }
     }
-    fprintf(stdout, "\n");
+    std::fprintf(stdout, "\n");
 
     auto end = std::chrono::system_clock::now();
     auto dif = end - start;
-    fprintf(stdout, "Ray Tracing Pass : %lld(msec)\n", std::chrono::duration_cast<std::chrono::milliseconds>(dif).count());
+    std::fprintf(stdout, "Ray Tracing Pass : %lld(msec)\n", std::chrono::duration_cast<std::chrono::milliseconds>(dif).count());
 
     start = std::chrono::system_clock::now();
 
@@ -342,7 +341,7 @@ void trace_ray(int w, int h, Camera* camera)
 
     end = std::chrono::system_clock::now();
     dif = end - start;
-    fprintf(stdout, "Build Hash Grid: %lld(msec)\n", std::chrono::duration_cast<std::chrono::milliseconds>(dif).count());
+    std::fprintf(stdout, "Build Hash Grid: %lld(msec)\n", std::chrono::duration_cast<std::chrono::milliseconds>(dif).count());
 }
 
 //-------------------------------------------------------------------------------------------
@@ -358,7 +357,7 @@ void trace_photon(int s)
     for (int i = 0; i < s; i++)
     {
         auto p = 100.0 * (i + 1) / s;
-        fprintf(stdout, "\rPhotonPass %5.2f%%", p);
+        std::fprintf(stdout, "\rPhotonPass %5.2f%%", p);
         int m = PHOTON_COUNT_MUTIPLIER * i;
         Ray r({0,0,0}, {0,0,0});
         Vector3f f;
@@ -374,11 +373,11 @@ void trace_photon(int s)
         }
     }
 
-    fprintf(stdout, "\n");
+    std::fprintf(stdout, "\n");
 
     auto end = std::chrono::system_clock::now();
     auto dif = end - start;
-    fprintf(stdout, "Photon Tracing Pass : %lld(sec)\n", std::chrono::duration_cast<std::chrono::seconds>(dif).count());
+    std::fprintf(stdout, "Photon Tracing Pass : %lld(sec)\n", std::chrono::duration_cast<std::chrono::seconds>(dif).count());
 }
 
 //-------------------------------------------------------------------------------------------
@@ -405,8 +404,11 @@ int ppm(int w, int h, int s, Image* img, SceneParser* _parser)
     //auto s = 10000; // s * 1000 photon paths will be traced (s * PHOTON_COUNT_MULTIPLIER).
     auto c = new Vector3f[w * h];
     group = _parser->getGroup();
+    group->getKdTree();
     hpbbox.reset();
     parser = _parser;
+    _img = img;
+    _w = w;
     trace_ray(w, h, _parser->getCamera());
     trace_photon(s);
     density_estimation(c, s);
@@ -418,6 +420,7 @@ int ppm(int w, int h, int s, Image* img, SceneParser* _parser)
     for(int i = 0; i < (w*h); ++i)    // idx = x + y * w
         img->SetPixel(i % w, i / w, c[i]);
 
+    cout << unreach << endl;
     delete[] c;
     c = nullptr;
 

@@ -27,6 +27,8 @@ cmath
 -
 
 ../deps/vecmath/include/Vector3f.h
+iostream
+-
 
 ../deps/vecmath/include/Vector4f.h
 
@@ -47,8 +49,6 @@ Vector4f.h
 ../deps/vecmath/include/Vector4f.h
 
 ../include/aabb.hpp
-object3d.hpp
-../include/object3d.hpp
 vecmath.h
 -
 vector
@@ -59,8 +59,6 @@ algorithm
 -
 iostream
 -
-plane.hpp
-../include/plane.hpp
 
 ../include/bbox.hpp
 vecmath.h
@@ -97,6 +95,12 @@ hit.hpp
 ../include/hit.hpp
 vector
 -
+kdnode.hpp
+../include/kdnode.hpp
+algorithm
+-
+iostream
+-
 
 ../include/halton.hpp
 
@@ -114,6 +118,14 @@ vecmath.h
 cassert
 -
 vecmath.h
+-
+
+../include/kdnode.hpp
+object3d.hpp
+../include/object3d.hpp
+hit.hpp
+../include/hit.hpp
+vector
 -
 
 ../include/light.hpp
@@ -145,6 +157,8 @@ Vector2f.h
 ../include/Vector2f.h
 Vector3f.h
 ../include/Vector3f.h
+kdnode.hpp
+../include/kdnode.hpp
 
 ../include/object3d.hpp
 ray.hpp
@@ -153,6 +167,8 @@ hit.hpp
 ../include/hit.hpp
 material.hpp
 ../include/material.hpp
+aabb.hpp
+../include/aabb.hpp
 
 ../include/plane.hpp
 object3d.hpp

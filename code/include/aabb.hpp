@@ -1,38 +1,38 @@
 #ifndef AABB_HPP
 #define AABB_HPP
 
-#include "object3d.hpp"
 #include <vecmath.h>
 #include <vector>
 #include <utility>
 #include <algorithm>
 #include <iostream>
-#include "plane.hpp"
 using namespace std;
 
 const float dir[3][3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
 
-class AABB : public Object3D
+class Object3D;
+
+class AABB
 {
     //static float dir[3][3];
     // 3个平面确定一个包围盒
-    float axis_planes[3][2]; // 0:x, 1:y, 2:z // 0: min, 1: max
+    
 public:
-    AABB()
-    {
-
-    }
-    AABB(std::vector<std::pair<float, float>> axis, Material *material = nullptr)
-    : Object3D(material)
+    float axis_planes[3][2]; // 0:x, 1:y, 2:z // 0: min, 1: max
+    AABB() {}
+    explicit AABB(std::vector<std::pair<float, float>> axis, Object3D* content)
+    : content(content)
     {
         axis_planes[0][0] = axis[0].first, axis_planes[0][1] = axis[0].second;
         axis_planes[1][0] = axis[1].first, axis_planes[1][1] = axis[1].second;
         axis_planes[2][0] = axis[2].first, axis_planes[2][1] = axis[2].second;
     }
-    bool intersect(const Ray &r, Hit &h, float tmin) override
+    bool intersect(const Ray &r, Hit &h, float tmin)
     {
         //cout << "Start intersecting" << endl;
         Vector3f o = r.getOrigin();
+        if(inside(o))
+            return true;
         float tm = 1e38;
         int idx = 0;
         bool re = false;
@@ -41,7 +41,11 @@ public:
         {
             int close = (fabsf(axis_planes[i][0] - o[i]) > fabsf(axis_planes[i][1] - o[i])) ? 1 : 0;
             Hit ht;
-            float temp = get_axis_plane_t(i, close, r, ht);
+            float temp;
+            if (get_axis_plane_t(i, close, r, ht))
+                temp = ht.getT();
+            else 
+                continue;
             Vector3f inte = r.pointAtParameter(ht.getT());
             bool inside = true;
             for (int j = 0; j < 3; ++j)
@@ -72,6 +76,17 @@ public:
         return re;
     }
 
+    bool inside(const Vector3f& v)
+    {
+        if(v.x() < axis_planes[0][0] || v.x() > axis_planes[0][1])
+            return false;
+        if (v.y() < axis_planes[1][0] || v.y() > axis_planes[1][1])
+            return false;
+        if (v.z() < axis_planes[2][0] || v.z() > axis_planes[2][1])
+            return false;
+        return true;
+    }
+
     void debug()
     {
         for(int i = 0; i < 3; ++i)
@@ -82,17 +97,44 @@ public:
         }
     }
 
+    Object3D* content;
+
+    static AABB merge(const AABB &a, const AABB &b)
+    {
+        AABB re;
+        for (int i = 0; i < 3; ++i)
+        {
+            re.axis_planes[i][0] = min(a.axis_planes[i][0], b.axis_planes[i][0]);
+            re.axis_planes[i][1] = max(a.axis_planes[i][1], b.axis_planes[i][1]);
+        }
+        return re;
+    }
+
+
+
 protected:
-    float get_axis_plane_t(int axis, int direction, const Ray& r, Hit &h)
+    bool get_axis_plane_t(int axis, int direction, const Ray& r, Hit &h)
     {
         Vector3f normal(dir[axis][0], dir[axis][1], dir[axis][2]);
-        float D = axis_planes[axis][direction];
-        Plane p(normal, D, material);
-        p.intersect(r, h, 0);
-        return h.getT();
+        float D = -axis_planes[axis][direction];
+        //Plane p(normal, D, nullptr);
+        //p.intersect(r, h, 0);
+        float t = -(D + Vector3f::dot(normal, r.getOrigin())) / Vector3f::dot(normal, r.getDirection().normalized());
+        if (t > h.getT() || t < 0)
+            return false;
+
+        Vector3f n = Vector3f::dot(r.getDirection(), normal) > 0 ? -normal : normal;
+        h.set(t, nullptr, n);
+        return true;
     }
 };
 
-
+inline std::ostream &operator<<(std::ostream &os, const AABB &a)
+{
+    os << a.axis_planes[0][0] << " " << a.axis_planes[0][1] << " "
+       << a.axis_planes[1][0] << " " << a.axis_planes[1][1] << " "
+       << a.axis_planes[2][0] << " " << a.axis_planes[2][1] << " "<< std::endl;
+    return os;
+}
 
 #endif // AABB_HPP

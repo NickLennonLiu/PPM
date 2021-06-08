@@ -40,6 +40,11 @@ private:
 
 };
 
+inline std::ostream &operator<<(std::ostream &os, const Vector3f &a)
+{
+    os << "(" << a.x() << "," << a.y() << "," << a.z() << ")";
+}
+
 inline std::ostream &operator<<(std::ostream &os, const Ray &r) {
     os << "Ray <" << r.getOrigin() << ", " << r.getDirection() << ">";
     return os;

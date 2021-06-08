@@ -1,5 +1,6 @@
 #ifndef VECTOR_3F_H
 #define VECTOR_3F_H
+#include <iostream>
 
 class Vector2f;
 

@@ -29,10 +29,10 @@ CMakeFiles/PA1.dir/src/main.cpp.o
  ../include/hit.hpp
  ../include/hitrecord.hpp
  ../include/image.hpp
+ ../include/kdnode.hpp
  ../include/light.hpp
  ../include/material.hpp
  ../include/object3d.hpp
- ../include/plane.hpp
  ../include/ppm.hpp
  ../include/ray.hpp
  ../include/scene_parser.hpp
@@ -47,7 +47,9 @@ CMakeFiles/PA1.dir/src/mesh.cpp.o
  ../deps/vecmath/include/Vector3f.h
  ../deps/vecmath/include/Vector4f.h
  ../deps/vecmath/include/vecmath.h
+ ../include/aabb.hpp
  ../include/hit.hpp
+ ../include/kdnode.hpp
  ../include/material.hpp
  ../include/mesh.hpp
  ../include/object3d.hpp
@@ -68,6 +70,7 @@ CMakeFiles/PA1.dir/src/scene_parser.cpp.o
  ../include/curve.hpp
  ../include/group.hpp
  ../include/hit.hpp
+ ../include/kdnode.hpp
  ../include/light.hpp
  ../include/material.hpp
  ../include/mesh.hpp

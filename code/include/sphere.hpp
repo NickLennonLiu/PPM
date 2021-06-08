@@ -12,7 +12,6 @@ public:
     : center(Vector3f(0))
     , radius(0)
     {
-        gen_box();
         // unit ball at the center
     }
 
@@ -21,8 +20,6 @@ public:
     , center(center)
     , radius(radius)
     {
-        gen_box();
-        
     }
 
     ~Sphere() override = default;
@@ -59,15 +56,14 @@ public:
         return false;
     }
 
+    AABB bbox()
+    {
+        return AABB({{center[0] - radius, center[0] + radius}, {center[1] - radius, center[1] + radius}, {center[2] - radius, center[2] + radius}}, this);
+    }
+
 protected:
     float radius;
     Vector3f center;
-    AABB box;
-
-    void gen_box()
-    {
-        box = AABB({{center[0] - radius, center[0] + radius}, {center[1] - radius, center[1] + radius}, {center[2] - radius, center[2] + radius}}, material);
-    }
 };
 
 
