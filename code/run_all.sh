@@ -7,8 +7,8 @@ if [[ ! -d build ]]; then
     cmake -DCMAKE_BUILD_TYPE=Debug ..
     cd ..
 else
-    # rm -r build
-    # mkdir -p build
+    rm -r build
+    mkdir -p build
     cd build
     cmake -DCMAKE_BUILD_TYPE=Debug ..
     cd ..
@@ -31,3 +31,4 @@ mkdir -p output
 #bin/PA1 testcases/scene07_shine.txt output/scene07.bmp
 #bin/PA1 testcases/scene08_single.txt output/scene08.bmp
 bin/PA1 testcases/scene09_ppm.txt output/scene09.bmp
+#bin/PA1 testcases/scene10_cube.txt output/scene10.bmp

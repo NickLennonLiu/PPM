@@ -26,10 +26,13 @@ public:
     std::vector<Vector3f> v;
     std::vector<TriangleIndex> t;
     std::vector<Vector3f> n;
+    std::vector<Triangle> triangles;
     bool intersect(const Ray &r, Hit &h, float tmin) override;
+    AABB bbox() override;
 
 private:
     KdNode* root;
+    AABB box;
     // Normal can be used for light estimation
     void computeNormal();
     void getKdTree();

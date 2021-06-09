@@ -12,7 +12,9 @@ public:
     KdNode *lc, *rc;
     AABB bbox;
     KdNode(AABB b, KdNode*lc = nullptr, KdNode* rc = nullptr)
-    : lc(lc), rc(rc), bbox(b) {}
+    : lc(lc), rc(rc), bbox(b) {
+        //cout << lc <<" " <<  rc << bbox << " " << bbox.content << endl;
+    }
 
     bool intersect(const Ray &r, Hit &h, float tmin)
     {
@@ -20,17 +22,15 @@ public:
         Hit th;
         if(!bbox.intersect(r, th, tmin))
             return false;
-        // 根节点
+        // 叶节点
         if(lc == nullptr && rc == nullptr)
         {
             return bbox.content->intersect(r,h,tmin);
         }
         bool re = false;
-        th = tmp;
-        if(lc->bbox.intersect(r, th, tmin))
+        if(lc)
             re |= lc->intersect(r, h, tmin);
-        th = tmp;
-        if(rc->bbox.intersect(r, th, tmin))
+        if(rc)
             re |= rc->intersect(r, h, tmin);
         return re;
     }
@@ -67,7 +67,9 @@ public:
         if (end == start)
             return nullptr;
         if (end == start + 1)
+        {
             return new KdNode(bboxs[start]);
+        }
         if (dir == 0)
             sort(bboxs.begin() + start, bboxs.begin() + end, cmpX);
         else if (dir == 1)
@@ -77,7 +79,7 @@ public:
         KdNode *lc = split(start, start + (end - start) / 2, (dir + 1) % 3, bboxs),
                *rc = split(start + (end - start) / 2, end, (dir + 1) % 3, bboxs);
         AABB box = AABB::merge(lc->bbox, rc->bbox);
-        std::cout << box;
+        //std::cout << box;
         return new KdNode(box, lc, rc);
     }
 };

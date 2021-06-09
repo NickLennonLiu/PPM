@@ -20,7 +20,7 @@ namespace /* anonymous */
 
 } // namespace
 
-double halton(const int b, int j)
+static double halton(const int b, int j)
 {
     int bb = b % 61;
     const auto p = primes[bb];

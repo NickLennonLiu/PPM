@@ -1,4 +1,4 @@
-# Install script for directory: /mnt/c/Users/11722/code/CG/PPM/code/deps/vecmath
+# Install script for directory: /media/junetheriver/OS/Users/11722/code/CG/PPM/code/deps/vecmath
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

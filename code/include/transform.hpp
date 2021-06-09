@@ -36,6 +36,11 @@ public:
         return inter;
     }
 
+    AABB bbox() override
+    {
+        return AABB({{-100, 100}, {-100, 100}, {-100,100}}, this);
+    }
+
 protected:
     Object3D *o; //un-transformed object
     Matrix4f transform;

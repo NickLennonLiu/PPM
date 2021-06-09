@@ -3,6 +3,8 @@
 
 #include <Vector3f.h>
 #include "object3d.hpp"
+#include "halton.hpp"
+#include "ray.hpp"
 
 class Light {
 public:
@@ -10,15 +12,18 @@ public:
 
     virtual ~Light() = default;
 
-    virtual void getIllumination(const Vector3f &p, Vector3f &dir, Vector3f &col) const = 0;
-
-    Vector3f direction;
+    virtual void genp(Ray &pr, Vector3f *f, int i) = 0;
+    
     Vector3f color;
-    Vector3f position;
+    Vector3f flux;
+
 };
 
 
 class DirectionalLight : public Light {
+    Vector3f direction;
+    Vector3f position;
+    Vector3f axis1, axis2;
 public:
     DirectionalLight() = delete;
 
@@ -29,36 +34,37 @@ public:
 
     ~DirectionalLight() override = default;
 
-    ///@param p unsed in this function
-    ///@param distanceToLight not well defined because it's not a point light
-    void getIllumination(const Vector3f &p, Vector3f &dir, Vector3f &col) const override {
-        // the direction to the light is the opposite of the
-        // direction of the directional light source
-        dir = -direction;
-        col = color;
+    virtual void genp(Ray &pr, Vector3f *f, int i) override
+    {
+        (*f) = flux * (D_PI * 4.0); // flux
+        auto p = 2.0 * D_PI * halton(0, i);
+        auto t = 2.0 * acos(sqrt(1. - halton(1, i)));
+        auto st = sin(t);
+        pr = Ray(position, Vector3f(cos(p) * st, cos(t), sin(p) * st));
     }
-
 };
 
 class PointLight : public Light {
+    Vector3f position;
 public:
     PointLight() = delete;
 
-    PointLight(const Vector3f &p, const Vector3f &c) {
+    PointLight(const Vector3f &p, const Vector3f &c, const Vector3f& f = Vector3f({100, 100, 100})) {
         position = p;
         color = c;
+        flux = f;
     }
 
     ~PointLight() override = default;
 
-    void getIllumination(const Vector3f &p, Vector3f &dir, Vector3f &col) const override {
-        // the direction to the light is the opposite of the
-        // direction of the directional light source
-        dir = (position - p);
-        dir = dir / dir.length();
-        col = color;
+    virtual void genp(Ray &pr, Vector3f *f, int i) override
+    {
+        (*f) = flux * (D_PI * 4.0); // flux
+        auto p = 2.0 * D_PI * halton(0, i);
+        auto t = 2.0 * acos(sqrt(1. - halton(1, i)));
+        auto st = sin(t);
+        pr = Ray(position, Vector3f(cos(p) * st, cos(t), sin(p) * st));
     }
-
 };
 
 #endif // LIGHT_H

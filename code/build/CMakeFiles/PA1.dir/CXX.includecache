@@ -133,6 +133,10 @@ Vector3f.h
 -
 object3d.hpp
 ../include/object3d.hpp
+halton.hpp
+../include/halton.hpp
+ray.hpp
+../include/ray.hpp
 
 ../include/material.hpp
 cassert
@@ -252,7 +256,7 @@ vecmath.h
 cmath
 -
 
-/mnt/c/Users/11722/code/CG/PPM/code/src/image.cpp
+/media/junetheriver/OS/Users/11722/code/CG/PPM/code/src/image.cpp
 cstdlib
 -
 cstdio
@@ -260,9 +264,9 @@ cstdio
 cstring
 -
 image.hpp
-/mnt/c/Users/11722/code/CG/PPM/code/src/image.hpp
+/media/junetheriver/OS/Users/11722/code/CG/PPM/code/src/image.hpp
 
-/mnt/c/Users/11722/code/CG/PPM/code/src/main.cpp
+/media/junetheriver/OS/Users/11722/code/CG/PPM/code/src/main.cpp
 cassert
 -
 cstdio
@@ -276,23 +280,23 @@ cmath
 iostream
 -
 scene_parser.hpp
-/mnt/c/Users/11722/code/CG/PPM/code/src/scene_parser.hpp
+/media/junetheriver/OS/Users/11722/code/CG/PPM/code/src/scene_parser.hpp
 image.hpp
-/mnt/c/Users/11722/code/CG/PPM/code/src/image.hpp
+/media/junetheriver/OS/Users/11722/code/CG/PPM/code/src/image.hpp
 camera.hpp
-/mnt/c/Users/11722/code/CG/PPM/code/src/camera.hpp
+/media/junetheriver/OS/Users/11722/code/CG/PPM/code/src/camera.hpp
 group.hpp
-/mnt/c/Users/11722/code/CG/PPM/code/src/group.hpp
+/media/junetheriver/OS/Users/11722/code/CG/PPM/code/src/group.hpp
 light.hpp
-/mnt/c/Users/11722/code/CG/PPM/code/src/light.hpp
+/media/junetheriver/OS/Users/11722/code/CG/PPM/code/src/light.hpp
 ppm.hpp
-/mnt/c/Users/11722/code/CG/PPM/code/src/ppm.hpp
+/media/junetheriver/OS/Users/11722/code/CG/PPM/code/src/ppm.hpp
 string
 -
 
-/mnt/c/Users/11722/code/CG/PPM/code/src/mesh.cpp
+/media/junetheriver/OS/Users/11722/code/CG/PPM/code/src/mesh.cpp
 mesh.hpp
-/mnt/c/Users/11722/code/CG/PPM/code/src/mesh.hpp
+/media/junetheriver/OS/Users/11722/code/CG/PPM/code/src/mesh.hpp
 fstream
 -
 iostream
@@ -306,7 +310,7 @@ utility
 sstream
 -
 
-/mnt/c/Users/11722/code/CG/PPM/code/src/scene_parser.cpp
+/media/junetheriver/OS/Users/11722/code/CG/PPM/code/src/scene_parser.cpp
 cstdio
 -
 cstring
@@ -316,29 +320,29 @@ cstdlib
 cmath
 -
 scene_parser.hpp
-/mnt/c/Users/11722/code/CG/PPM/code/src/scene_parser.hpp
+/media/junetheriver/OS/Users/11722/code/CG/PPM/code/src/scene_parser.hpp
 camera.hpp
-/mnt/c/Users/11722/code/CG/PPM/code/src/camera.hpp
+/media/junetheriver/OS/Users/11722/code/CG/PPM/code/src/camera.hpp
 light.hpp
-/mnt/c/Users/11722/code/CG/PPM/code/src/light.hpp
+/media/junetheriver/OS/Users/11722/code/CG/PPM/code/src/light.hpp
 material.hpp
-/mnt/c/Users/11722/code/CG/PPM/code/src/material.hpp
+/media/junetheriver/OS/Users/11722/code/CG/PPM/code/src/material.hpp
 object3d.hpp
-/mnt/c/Users/11722/code/CG/PPM/code/src/object3d.hpp
+/media/junetheriver/OS/Users/11722/code/CG/PPM/code/src/object3d.hpp
 group.hpp
-/mnt/c/Users/11722/code/CG/PPM/code/src/group.hpp
+/media/junetheriver/OS/Users/11722/code/CG/PPM/code/src/group.hpp
 mesh.hpp
-/mnt/c/Users/11722/code/CG/PPM/code/src/mesh.hpp
+/media/junetheriver/OS/Users/11722/code/CG/PPM/code/src/mesh.hpp
 sphere.hpp
-/mnt/c/Users/11722/code/CG/PPM/code/src/sphere.hpp
+/media/junetheriver/OS/Users/11722/code/CG/PPM/code/src/sphere.hpp
 plane.hpp
-/mnt/c/Users/11722/code/CG/PPM/code/src/plane.hpp
+/media/junetheriver/OS/Users/11722/code/CG/PPM/code/src/plane.hpp
 triangle.hpp
-/mnt/c/Users/11722/code/CG/PPM/code/src/triangle.hpp
+/media/junetheriver/OS/Users/11722/code/CG/PPM/code/src/triangle.hpp
 transform.hpp
-/mnt/c/Users/11722/code/CG/PPM/code/src/transform.hpp
+/media/junetheriver/OS/Users/11722/code/CG/PPM/code/src/transform.hpp
 curve.hpp
-/mnt/c/Users/11722/code/CG/PPM/code/src/curve.hpp
+/media/junetheriver/OS/Users/11722/code/CG/PPM/code/src/curve.hpp
 revsurface.hpp
-/mnt/c/Users/11722/code/CG/PPM/code/src/revsurface.hpp
+/media/junetheriver/OS/Users/11722/code/CG/PPM/code/src/revsurface.hpp
 

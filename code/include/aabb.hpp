@@ -20,7 +20,7 @@ class AABB
 public:
     float axis_planes[3][2]; // 0:x, 1:y, 2:z // 0: min, 1: max
     AABB() {}
-    explicit AABB(std::vector<std::pair<float, float>> axis, Object3D* content)
+    explicit AABB(std::vector<std::pair<float, float>> axis, Object3D* content = nullptr)
     : content(content)
     {
         axis_planes[0][0] = axis[0].first, axis_planes[0][1] = axis[0].second;
@@ -43,7 +43,9 @@ public:
             Hit ht;
             float temp;
             if (get_axis_plane_t(i, close, r, ht))
+            {
                 temp = ht.getT();
+            }
             else 
                 continue;
             Vector3f inte = r.pointAtParameter(ht.getT());
@@ -93,8 +95,9 @@ public:
         {
             for(int j = 0; j < 2; ++j)
                 cout << axis_planes[i][j] << " ";
-            cout << endl;
         }
+        cout << content;
+        cout << endl;
     }
 
     Object3D* content;
@@ -102,6 +105,7 @@ public:
     static AABB merge(const AABB &a, const AABB &b)
     {
         AABB re;
+        re.content = nullptr;
         for (int i = 0; i < 3; ++i)
         {
             re.axis_planes[i][0] = min(a.axis_planes[i][0], b.axis_planes[i][0]);
@@ -133,7 +137,7 @@ inline std::ostream &operator<<(std::ostream &os, const AABB &a)
 {
     os << a.axis_planes[0][0] << " " << a.axis_planes[0][1] << " "
        << a.axis_planes[1][0] << " " << a.axis_planes[1][1] << " "
-       << a.axis_planes[2][0] << " " << a.axis_planes[2][1] << " "<< std::endl;
+       << a.axis_planes[2][0] << " " << a.axis_planes[2][1] << " ";
     return os;
 }
 

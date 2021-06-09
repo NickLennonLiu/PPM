@@ -39,6 +39,18 @@ public:
 	}
 	Vector3f normal;
 	Vector3f vertices[3];
+
+	AABB bbox()
+	{
+		AABB re = AABB({{0,0}, {0,0},{0,0}}, this);
+		for(int i = 0; i < 3; ++i)
+		{
+			re.axis_planes[i][0] = std::min(vertices[0][i], std::min(vertices[1][i], vertices[2][i]));
+			re.axis_planes[i][1] = std::max(vertices[0][i], std::max(vertices[1][i], vertices[2][i]));
+		}
+		return re;
+	}
+
 protected:
 	
 };

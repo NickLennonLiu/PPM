@@ -166,8 +166,9 @@ inline bool intersect(const Ray &r, double &t, int &id)
 */
 
 //-------------------------------------------------------------------------------------------
-//      フォトンレイを生成します.
+//     生成Photon Ray
 //-------------------------------------------------------------------------------------------
+/*
 void genp(Ray &pr, Vector3f *f, int i, Light* light)
 {
     // generate a photon ray from the point light source with QMC
@@ -177,9 +178,10 @@ void genp(Ray &pr, Vector3f *f, int i, Light* light)
     auto st = sin(t);
     pr = Ray(light->position, Vector3f(cos(p) * st, cos(t), sin(p) * st));
 }
+*/
 
 //-------------------------------------------------------------------------------------------
-//      レイを追跡します.
+//      光线跟踪
 //-------------------------------------------------------------------------------------------
 void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &adj, int i, int depth)
 {
@@ -187,7 +189,7 @@ void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &ad
     int id;
     Hit h;
     dpt++;
-    if (!group->intersect(r, h, 1e-3) || (dpt >= 20))
+    if (!group->intersect(r, h, 1e-1) || (dpt >= 20))
         return;
 
     auto d3 = dpt * 3;
@@ -311,21 +313,14 @@ void trace_ray(int w, int h, Camera* camera)
     auto start = std::chrono::system_clock::now();
     hitpoints.clear();
     // trace eye rays and store measurement points
-    Ray cam(
-        camera->center,
-        camera->direction.normalized());
-    auto cx = Vector3f(w * 0.5135 / h, 0, 0);
-    auto cy = (Vector3f::cross(cx, cam.getDirection())).normalized() * 0.5135;
     cout << w * h << endl;
     for (int y = 0; y < h; y++)
     {
         std::fprintf(stdout, "\rHitPointPass %5.2f%%", 100.0 * y / (h - 1));
-
         for (int x = 0; x < w; x++)
         {
             auto idx = x + y * w;   
-            auto d = cx * ((x + 0.5) / w - 0.5) + cy * (-(y + 0.5) / h + 0.5) + cam.getDirection();
-            trace(Ray(cam.getOrigin() + d * 1, d.normalized()), 0, true, Vector3f(), Vector3f(1, 1, 1), idx, 0);
+            trace(camera->generateRay({x, y}), 0, true, Vector3f(), Vector3f(1, 1, 1), idx, 0);
         }
     }
     std::fprintf(stdout, "\n");
@@ -366,7 +361,8 @@ void trace_photon(int s)
         {
             for (int li = 0; li < parser->getNumLights(); ++li)
             {
-                genp(r, &f, m + j, parser->getLight(li));
+                //genp(r, &f, m + j, parser->getLight(li));
+                parser->getLight(li)->genp(r, &f, m+j);
                 trace(r, 0, false, f, vw, m + j, 0);
             }
             

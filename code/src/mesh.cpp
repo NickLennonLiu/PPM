@@ -9,6 +9,7 @@
 bool Mesh::intersect(const Ray &r, Hit &h, float tmin) {
 
     // Optional: Change this brute force method into a faster one.
+    /*
     bool result = false;
     for (int triId = 0; triId < (int) t.size(); ++triId) {
         TriangleIndex& triIndex = t[triId];
@@ -18,6 +19,9 @@ bool Mesh::intersect(const Ray &r, Hit &h, float tmin) {
         result |= triangle.intersect(r, h, tmin);
     }
     return result;
+    */
+    bool re = root->intersect(r, h, tmin);
+    return re;
 }
 
 Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
@@ -79,7 +83,7 @@ Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
         }
     }
     computeNormal();
-    
+    getKdTree();
     f.close();
 }
 
@@ -92,4 +96,30 @@ void Mesh::computeNormal() {
         b = Vector3f::cross(a, b);
         n[triId] = b / b.length();
     }
+}
+
+void Mesh::getKdTree() {
+    vector<AABB> bboxs;
+    for (int triId = 0; triId < (int)t.size(); ++triId)
+    {
+        TriangleIndex &triIndex = t[triId];
+        Triangle triangle(v[triIndex[0]],
+                          v[triIndex[1]], v[triIndex[2]], material);
+        triangle.normal = n[triId];
+        triangles.push_back(triangle);
+        //bboxs.push_back(triangle.bbox());
+    }
+    for(auto &i : triangles)
+    {
+        AABB tbox = i.bbox();
+        box = AABB::merge(box, tbox);
+        bboxs.push_back(tbox);
+    }
+    root = KdNode::split(0, bboxs.size(), 0, bboxs);
+    box.content = this;
+}
+
+AABB Mesh::bbox()
+{
+    return box;
 }

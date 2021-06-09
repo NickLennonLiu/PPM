@@ -31,6 +31,8 @@ SET(PA1_INCLUDES
         include/aabb.hpp
         include/curve.hpp
         include/revsurface.hpp
+        include/kdnode.hpp
+        include/halton.hpp
         )
 
 SET(CMAKE_CXX_STANDARD 11)
