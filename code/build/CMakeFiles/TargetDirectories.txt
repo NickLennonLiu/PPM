@@ -1,6 +1,0 @@
-/media/junetheriver/OS/Users/11722/code/CG/PPM/code/build/CMakeFiles/rebuild_cache.dir
-/media/junetheriver/OS/Users/11722/code/CG/PPM/code/build/CMakeFiles/edit_cache.dir
-/media/junetheriver/OS/Users/11722/code/CG/PPM/code/build/CMakeFiles/PA1.dir
-/media/junetheriver/OS/Users/11722/code/CG/PPM/code/build/deps/vecmath/CMakeFiles/rebuild_cache.dir
-/media/junetheriver/OS/Users/11722/code/CG/PPM/code/build/deps/vecmath/CMakeFiles/edit_cache.dir
-/media/junetheriver/OS/Users/11722/code/CG/PPM/code/build/deps/vecmath/CMakeFiles/vecmath.dir
