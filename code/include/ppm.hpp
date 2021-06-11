@@ -327,7 +327,7 @@ void trace_ray(int w, int h, Camera* camera)
 
     auto end = std::chrono::system_clock::now();
     auto dif = end - start;
-    std::fprintf(stdout, "Ray Tracing Pass : %lld(msec)\n", std::chrono::duration_cast<std::chrono::milliseconds>(dif).count());
+    std::fprintf(stdout, "Ray Tracing Pass : %ld(msec)\n", std::chrono::duration_cast<std::chrono::milliseconds>(dif).count());
 
     start = std::chrono::system_clock::now();
 
@@ -336,7 +336,7 @@ void trace_ray(int w, int h, Camera* camera)
 
     end = std::chrono::system_clock::now();
     dif = end - start;
-    std::fprintf(stdout, "Build Hash Grid: %lld(msec)\n", std::chrono::duration_cast<std::chrono::milliseconds>(dif).count());
+    std::fprintf(stdout, "Build Hash Grid: %ld(msec)\n", std::chrono::duration_cast<std::chrono::milliseconds>(dif).count());
 }
 
 //-------------------------------------------------------------------------------------------
@@ -373,7 +373,7 @@ void trace_photon(int s)
 
     auto end = std::chrono::system_clock::now();
     auto dif = end - start;
-    std::fprintf(stdout, "Photon Tracing Pass : %lld(sec)\n", std::chrono::duration_cast<std::chrono::seconds>(dif).count());
+    std::fprintf(stdout, "Photon Tracing Pass : %ld(sec)\n", std::chrono::duration_cast<std::chrono::seconds>(dif).count());
 }
 
 //-------------------------------------------------------------------------------------------

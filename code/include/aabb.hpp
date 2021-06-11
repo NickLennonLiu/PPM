@@ -123,7 +123,7 @@ protected:
         float D = -axis_planes[axis][direction];
         //Plane p(normal, D, nullptr);
         //p.intersect(r, h, 0);
-        float t = -(D + Vector3f::dot(normal, r.getOrigin())) / Vector3f::dot(normal, r.getDirection().normalized());
+        float t = -(D + Vector3f::dot(normal, r.getOrigin())) / Vector3f::dot(normal, r.getDirection());
         if (t > h.getT() || t < 0)
             return false;
 

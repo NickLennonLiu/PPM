@@ -1,8 +1,8 @@
 
 PerspectiveCamera {
-    center 0.8 0.8 0.8
-    direction -1 -1 -1
-    up 0 1 0
+    center 4 4 -2.5
+    direction -1 -1 -0.003
+    up 0 0 1
     angle 25
     width 500
     height 500
@@ -11,7 +11,7 @@ PerspectiveCamera {
 Lights {
     numLights 1
     PointLight {
-        position 0 0 0
+        position 4 4 0
 	    color 0.7 0.7 0.7
     }
 }
@@ -22,10 +22,10 @@ Background {
 
 Materials {
     numMaterials 2
-    Material { Color 0.2 0 0.7
-        type 2
+    Material { Color 0.2 0 0.9
+        type 1
     }
-    Material { Color 0.6 0.7 0.6
+    Material { Color 0.45 0.5 0.45
         type 0
     }
 }
@@ -35,10 +35,10 @@ Group {
 
     MaterialIndex 0
     Transform {
-		UniformScale 1
-		Translate  0 -0.1 0 
-        YRotate 90	
-        ZRotate 350
+        Translate 0 0 -4
+		UniformScale 5
+        XRotate 90
+        YRotate 180
         TriangleMesh {
             obj_file mesh/bunny_1k.obj
         }
@@ -47,34 +47,34 @@ Group {
     MaterialIndex 1
     Sphere {
         center -100 0 0
-        radius 97
+        radius 96
     }
     MaterialIndex 1
     Sphere {
         center 100 0 0
-        radius 97
+        radius 96
     }
 
     MaterialIndex 1
     Sphere {
         center 0 -100 0
-        radius 97
+        radius 96
     }
     MaterialIndex 1
     Sphere {
         center 0 100 0
-        radius 97
+        radius 96
     }
 
     MaterialIndex 1
     Sphere {
         center 0 0 -100
-        radius 97
+        radius 96
     }
     MaterialIndex 1
     Sphere {
         center 0 0 100 
-        radius 97
+        radius 96
     }
 
 }
