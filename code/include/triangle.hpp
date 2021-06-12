@@ -13,13 +13,21 @@ public:
 	Triangle() = delete;
 
     // a b c are three vertex positions of the triangle
-	Triangle( const Vector3f& a, const Vector3f& b, const Vector3f& c, Material* m) 
+	Triangle( const Vector3f& a, const Vector3f& b, const Vector3f& c, 
+				Material* m, 
+				const Vector3f& an = Vector3f::ZERO, 
+				const Vector3f& bn = Vector3f::ZERO,
+				const Vector3f& cn = Vector3f::ZERO) 
 	: Object3D(m) 
 	{
-		vertices[0] = a;
-		vertices[1] = b;
-		vertices[2] = c;
-		normal = (Vector3f::cross(a - b, a - c)).normalized();
+		vertices[0] = a; normals[0] = an;
+		vertices[1] = b; normals[1] = bn;
+		vertices[2] = c; normals[2] = cn;
+		if(an == Vector3f::ZERO && bn == Vector3f::ZERO && cn == Vector3f::ZERO)
+		{
+			normals[0] = (Vector3f::cross(a - b, a - c)).normalized();
+			normals[1] = normals[2] = normals[0];
+		}
 	}
 
 	bool intersect( const Ray& ray,  Hit& hit , float tmin) override {
@@ -31,13 +39,14 @@ public:
 		if (0 <= beta && 0 <= gamma && (beta + gamma) <= 1)
 			if(t < hit.getT() && t > tmin)
 			{
-				Vector3f n = Vector3f::dot(ray.getDirection(), normal) > 0 ? -normal : normal;
+				Vector3f ip = interpolate(beta, gamma);
+				Vector3f n = Vector3f::dot(ray.getDirection(), ip) > 0 ? -ip : ip;
 				hit.set(t, material, n);
 				return true;
 			}
         return false;
 	}
-	Vector3f normal;
+	Vector3f normals[3];
 	Vector3f vertices[3];
 
 	AABB bbox()
@@ -52,7 +61,10 @@ public:
 	}
 
 protected:
-	
+	Vector3f interpolate(float beta, float gamma)
+	{
+		return normals[0] * (1 - beta - gamma) + normals[1] * beta + normals[2] * gamma;
+	}
 };
 
 #endif //TRIANGLE_H

@@ -21,6 +21,7 @@ class RevSurface;
 
 class SceneParser
 {
+    int num_photons;
 public:
     SceneParser() = delete;
     SceneParser(const char *filename);
@@ -64,10 +65,16 @@ public:
         return group;
     }
 
+    int getPhoton() const
+    {
+        return num_photons;
+    }
+
 private:
     void parseFile();
     void parsePerspectiveCamera();
     void parseBackground();
+    void parsePhoton();
     void parseLights();
     Light *parsePointLight();
     Light *parseDirectionalLight();

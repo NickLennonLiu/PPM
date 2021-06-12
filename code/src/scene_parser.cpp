@@ -87,6 +87,8 @@ void SceneParser::parseFile() {
     while (getToken(token)) {
         if (!strcmp(token, "PerspectiveCamera")) {
             parsePerspectiveCamera();
+        } else if (!strcmp(token, "Photon")) {
+            parsePhoton();
         } else if (!strcmp(token, "Background")) {
             parseBackground();
         } else if (!strcmp(token, "Lights")) {
@@ -147,6 +149,24 @@ void SceneParser::parseBackground() {
             background_color = readVector3f();
         } else {
             printf("Unknown token in parseBackground: '%s'\n", token);
+            assert(0);
+        }
+    }
+}
+
+void SceneParser::parsePhoton() {
+    char token[MAX_PARSER_TOKEN_LENGTH];
+    // read in the number of photons / 1000
+    getToken(token);
+    assert (!strcmp(token, "{"));
+    while (true) {
+        getToken(token);
+        if (!strcmp(token, "}")) {
+            break;
+        } else if (!strcmp(token, "num")) {
+            num_photons = readInt();
+        } else {
+            printf("Unknown token in parsePhoton: '%s'\n", token);
             assert(0);
         }
     }

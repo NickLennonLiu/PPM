@@ -43,6 +43,7 @@ private:
 inline std::ostream &operator<<(std::ostream &os, const Vector3f &a)
 {
     os << "(" << a.x() << "," << a.y() << "," << a.z() << ")";
+    return os;
 }
 
 inline std::ostream &operator<<(std::ostream &os, const Ray &r) {

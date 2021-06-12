@@ -105,7 +105,10 @@ void Mesh::getKdTree() {
         TriangleIndex &triIndex = t[triId];
         Triangle triangle(v[triIndex[0]],
                           v[triIndex[1]], v[triIndex[2]], material);
-        triangle.normal = n[triId];
+        //TODO: Figure out a way to specify vertice norm
+        triangle.normals[0] = n[triId];
+        triangle.normals[1] = n[triId];
+        triangle.normals[2] = n[triId];
         triangles.push_back(triangle);
         //bboxs.push_back(triangle.bbox());
     }

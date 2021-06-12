@@ -47,7 +47,6 @@ namespace /* anonymous */
     SceneParser* parser;
     Image* _img;
     int _w;
-    int unreach = 0;
     /*
     Sphere sph[] =
         {
@@ -320,7 +319,7 @@ void trace_ray(int w, int h, Camera* camera)
         for (int x = 0; x < w; x++)
         {
             auto idx = x + y * w;   
-            trace(camera->generateRay({x, y}), 0, true, Vector3f(), Vector3f(1, 1, 1), idx, 0);
+            trace(camera->generateRay({(float)x, (float)y}), 0, true, Vector3f(), Vector3f(1, 1, 1), idx, 0);
         }
     }
     std::fprintf(stdout, "\n");
@@ -352,7 +351,9 @@ void trace_photon(int s)
     for (int i = 0; i < s; i++)
     {
         auto p = 100.0 * (i + 1) / s;
-        std::fprintf(stdout, "\rPhotonPass %5.2f%%", p);
+        auto tend = std::chrono::system_clock::now();
+        auto dif = (tend - start) / p  * (100 - p);
+        std::fprintf(stdout, "\rPhotonPass %5.2f%%, estimated time remained: %3.1ld(min)", p, std::chrono::duration_cast<std::chrono::seconds>(dif).count());
         int m = PHOTON_COUNT_MUTIPLIER * i;
         Ray r({0,0,0}, {0,0,0});
         Vector3f f;
@@ -416,7 +417,6 @@ int ppm(int w, int h, int s, Image* img, SceneParser* _parser)
     for(int i = 0; i < (w*h); ++i)    // idx = x + y * w
         img->SetPixel(i % w, i / w, c[i]);
 
-    cout << unreach << endl;
     delete[] c;
     c = nullptr;
 

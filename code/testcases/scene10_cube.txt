@@ -1,17 +1,21 @@
 
+Photon {
+    num 100
+}
+
 PerspectiveCamera {
-    center 4 4 -2.5
-    direction -1 -1 -0.003
+    center 0 0 -2.5
+    direction 1 1 0.15
     up 0 0 1
     angle 25
-    width 500
-    height 500
+    width 1024
+    height 768
 }
 
 Lights {
     numLights 1
     PointLight {
-        position 4 4 0
+        position 3 3 2
 	    color 0.7 0.7 0.7
     }
 }
@@ -21,22 +25,31 @@ Background {
 }
 
 Materials {
-    numMaterials 2
-    Material { Color 0.2 0 0.9
+    numMaterials 5
+    Material { Color 0.2 0.3 0.8
         type 1
     }
     Material { Color 0.45 0.5 0.45
         type 0
     }
+    Material { Color 0.1 0.3 0.7
+        type 0
+    }
+    Material { Color 0.7 0.7 0.7
+        type 1
+    }
+    Material { Color 0.7 0.1 0.3
+        type 2
+    } 
 }
 
 Group {
-    numObjects 7
+    numObjects 10
 
     MaterialIndex 0
     Transform {
-        Translate 0 0 -4
-		UniformScale 5
+        Translate 1 1 -5
+		UniformScale 8
         XRotate 90
         YRotate 180
         TriangleMesh {
@@ -44,37 +57,55 @@ Group {
         }
     }
 
+    MaterialIndex 3
+    Sphere {
+        center 3 3 -2
+        radius 0.9
+    }
+
+    MaterialIndex 2
+    Sphere {
+        center 3.5 -3 3
+        radius 3
+    }
+
+    MaterialIndex 4
+    Sphere {
+        center -3 3.5 3
+        radius 3
+    }
+
     MaterialIndex 1
     Sphere {
         center -100 0 0
-        radius 96
+        radius 95
     }
     MaterialIndex 1
     Sphere {
         center 100 0 0
-        radius 96
+        radius 95
     }
 
     MaterialIndex 1
     Sphere {
         center 0 -100 0
-        radius 96
+        radius 95
     }
     MaterialIndex 1
     Sphere {
         center 0 100 0
-        radius 96
+        radius 95
     }
 
     MaterialIndex 1
     Sphere {
         center 0 0 -100
-        radius 96
+        radius 95
     }
     MaterialIndex 1
     Sphere {
         center 0 0 100 
-        radius 96
+        radius 95
     }
 
 }

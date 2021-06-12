@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
     int w = parser.getCamera()->getWidth(), 
         h = parser.getCamera()->getHeight();
     Image img(w, h);
-    ppm(w, h, 1000, &img, &parser);
+    ppm(w, h, parser.getPhoton(), &img, &parser);
     /*
     for (int x = 0; x < w; ++x) {
         for (int y = 0; y < h; ++y) {
