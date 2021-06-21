@@ -47,26 +47,11 @@ namespace /* anonymous */
     SceneParser* parser;
     Image* _img;
     int _w;
-    /*
-    Sphere sph[] =
-        {
-            // Scene: radius, position, color, material
-            Sphere(Vector3f(1e5 + 1, 40.8, 81.6), 1e5, Material::Matte),   //Right
-            Sphere(Vector3f(-1e5 + 99, 40.8, 81.6), 1e5, Material::Matte), //Left
-            Sphere(Vector3f(50, 40.8, 1e5), 1e5, Material::Matte),         //Back
-            Sphere(Vector3f(50, 40.8, -1e5 + 170), 1e5, Material::Matte),     //Front
-            Sphere(Vector3f(50, 1e5, 81.6), 1e5, Material::Matte),         //Bottomm
-            Sphere(Vector3f(50, -1e5 + 81.6, 81.6), 1e5, Material::Matte), //Top
-            Sphere(Vector3f(27, 16.5, 47), 16.5, Material::Mirror),        //Mirror
-            Sphere(Vector3f(73, 16.5, 88), 16.5, Material::Glass),         //Glass
-            Sphere(Vector3f(50, 8.5, 60), 8.5, Material::Matte),           //Middle
-    };
-    */
 
 } // namespace
 
 //-------------------------------------------------------------------------------------------
-//      ハッシュキーを取得します.
+//      Get hash of coordinate
 //-------------------------------------------------------------------------------------------
 inline unsigned int get_hash(
     const int ix, const int iy, const int iz)
@@ -78,7 +63,7 @@ inline unsigned int get_hash(
 }
 
 //-------------------------------------------------------------------------------------------
-//      ハッシュグリッドを構築します.
+//      Build the hash grid for mapping
 //-------------------------------------------------------------------------------------------
 void build_hash_grid(
     const int w, const int h)
@@ -141,45 +126,6 @@ void build_hash_grid(
 }
 
 //-------------------------------------------------------------------------------------------
-//      交差判定を行います.
-//-------------------------------------------------------------------------------------------
-/*   使用框架中的相交
-inline bool intersect(const Ray &r, double &t, int &id)
-{
-
-    int n = sizeof(sph) / sizeof(sph[0]);
-    auto d = D_INF;
-    t = D_INF;
-    for (int i = 0; i < n; i++)
-    {
-        d = sph[i].intersect(r, Hit(), 0);
-        if (d < t)
-        {
-            t = d;
-            id = i;
-        }
-    }
-
-    return (t < D_INF);
-}
-*/
-
-//-------------------------------------------------------------------------------------------
-//     生成Photon Ray
-//-------------------------------------------------------------------------------------------
-/*
-void genp(Ray &pr, Vector3f *f, int i, Light* light)
-{
-    // generate a photon ray from the point light source with QMC
-    (*f) = Vector3f(100, 100, 100) * (D_PI * 4.0); // flux
-    auto p = 2.0 * D_PI * halton(0, i);
-    auto t = 2.0 * acos(sqrt(1. - halton(1, i)));
-    auto st = sin(t);
-    pr = Ray(light->position, Vector3f(cos(p) * st, cos(t), sin(p) * st));
-}
-*/
-
-//-------------------------------------------------------------------------------------------
 //      光线跟踪
 //-------------------------------------------------------------------------------------------
 void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &adj, int i, int depth)
@@ -188,19 +134,18 @@ void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &ad
     int id;
     Hit h;
     dpt++;
-    if (!group->intersect(r, h, 1e-1) || (dpt >= 20))
+    if (!group->intersect(r, h, 1e-2) || (dpt >= 20))
         return;
 
     auto d3 = dpt * 3;
 
-    //auto x = r.getOrigin() + r.getDirection() * t, n = (x - obj.pos).normal;    
-    auto x = r.pointAtParameter(h.getT()), n = h.getNormal();
-    auto material = h.getMaterial();
-    auto f = material->getColor();
-    auto nl = ((Vector3f::dot(r.getDirection(), n)) < 0) ? n : n * -1;
+    auto x = r.pointAtParameter(h.getT()), n = h.normal;
+    auto material = h.material;
+    auto f = material->Color;
+    auto nl = ((Vector3f::dot(r.direction, n)) < 0) ? n : n * -1;
     auto p = (f.x() > f.y() && f.x() > f.z()) ? f.x() : (f.y() > f.z()) ? f.y() : f.z();
 
-    if (material->getType() == 0) // Matte
+    if (material->type == 0) // Matte
     {
         if (m)
         {
@@ -259,25 +204,25 @@ void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &ad
                 trace(Ray(x, d), dpt, m, (f * fl) * (1. / p), (f * adj), i, depth+1);
         }
     }
-    else if (material->getType() == 1) // Mirror
+    else if (material->type == 1) // Mirror
     {
-        trace(Ray(x, Vector3f::reflect(r.getDirection(), n)), dpt, m, (f * fl), (f * adj), i, depth+1);
+        trace(Ray(x, Vector3f::reflect(r.direction, n)), dpt, m, (f * fl), (f * adj), i, depth+1);
     }
     else    // Glass
     {
-        Ray lr(x, Vector3f::reflect(r.getDirection(), n));
+        Ray lr(x, Vector3f::reflect(r.direction, n));
         auto into = Vector3f::dot(n, nl) > 0.0;
         auto nc = 1.0;
         auto nt = 1.5;
         auto nnt = (into) ? nc / nt : nt / nc;
-        auto ddn = Vector3f::dot(r.getDirection(), nl);
+        auto ddn = Vector3f::dot(r.direction, nl);
         auto cos2t = 1 - nnt * nnt * (1 - ddn * ddn);
 
         // total internal reflection
         if (cos2t < 0)
             return trace(lr, dpt, m, (f * fl), (f * adj), i, depth+1);
 
-        auto td = (r.getDirection() * nnt - n * ((into ? 1 : -1) * (ddn * nnt + sqrt(cos2t)))).normalized();
+        auto td = (r.direction * nnt - n * ((into ? 1 : -1) * (ddn * nnt + sqrt(cos2t)))).normalized();
         auto a = nt - nc;
         auto b = nt + nc;
         auto R0 = a * a / (b * b);
@@ -305,7 +250,7 @@ void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &ad
 }
 
 //-------------------------------------------------------------------------------------------
-//      eye rayを追跡します.
+//      Generate and trace camera ray
 //-------------------------------------------------------------------------------------------
 void trace_ray(int w, int h, Camera* camera)
 {
@@ -339,7 +284,7 @@ void trace_ray(int w, int h, Camera* camera)
 }
 
 //-------------------------------------------------------------------------------------------
-//      photon rayを追跡します.
+//      Generate and trace photons
 //-------------------------------------------------------------------------------------------
 void trace_photon(int s)
 {
@@ -353,7 +298,10 @@ void trace_photon(int s)
         auto p = 100.0 * (i + 1) / s;
         auto tend = std::chrono::system_clock::now();
         auto dif = (tend - start) / p  * (100 - p);
-        std::fprintf(stdout, "\rPhotonPass %5.2f%%, estimated time remained: %3.1ld(min)", p, std::chrono::duration_cast<std::chrono::seconds>(dif).count());
+        std::fprintf(stdout, "\rPhotonPass %5.2f%%, passed time: %ld(sec), estimated time remained: %3.1ld(min)", 
+                        p, 
+                        std::chrono::duration_cast<std::chrono::seconds>(tend - start).count(), 
+                        std::chrono::duration_cast<std::chrono::minutes>(dif).count());
         int m = PHOTON_COUNT_MUTIPLIER * i;
         Ray r({0,0,0}, {0,0,0});
         Vector3f f;
@@ -362,7 +310,6 @@ void trace_photon(int s)
         {
             for (int li = 0; li < parser->getNumLights(); ++li)
             {
-                //genp(r, &f, m + j, parser->getLight(li));
                 parser->getLight(li)->genp(r, &f, m+j);
                 trace(r, 0, false, f, vw, m + j, 0);
             }
@@ -378,7 +325,7 @@ void trace_photon(int s)
 }
 
 //-------------------------------------------------------------------------------------------
-//      密度推定を行います.
+//      Density estimation
 //-------------------------------------------------------------------------------------------
 void density_estimation(Vector3f *color, int num_photon)
 {
@@ -392,13 +339,10 @@ void density_estimation(Vector3f *color, int num_photon)
 }
 
 //-------------------------------------------------------------------------------------------
-//      メインエントリーポイントです.
+//      Main entrance of ppm
 //-------------------------------------------------------------------------------------------
 int ppm(int w, int h, int s, Image* img, SceneParser* _parser)
 {
-    //auto w = 1280;  // 画像の横幅.
-    //auto h = 1080;  // 画像の縦幅.
-    //auto s = 10000; // s * 1000 photon paths will be traced (s * PHOTON_COUNT_MULTIPLIER).
     auto c = new Vector3f[w * h];
     group = _parser->getGroup();
     group->getKdTree();

@@ -24,18 +24,21 @@ Background {
 }
 
 Materials {
-    numMaterials 2
+    numMaterials 3
     Material { Color 0.6 0.6 0.8
         type 2
     }
     Material { Color 0.15 0.25 0.15
         type 0
     }
+    Material { Color 0.7 0.7 0.7
+        type 1
+    }
 }
 
 Group {
     numObjects 7
-    MaterialIndex 0
+    MaterialIndex 2
     Transform {
         Translate 0 0 -4
         UniformScale 0.5

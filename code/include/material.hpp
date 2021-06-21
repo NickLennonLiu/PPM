@@ -25,7 +25,6 @@ public:
         return type;
     }
 
-protected:
     Vector3f Color;
     int type; // 0: Matte 1: Mirror, 2: Glass
 };

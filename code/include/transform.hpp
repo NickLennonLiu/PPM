@@ -38,7 +38,7 @@ public:
 
     AABB bbox() override
     {
-        return AABB({{-100, 100}, {-100, 100}, {-100,100}}, this);
+        return AABB({{-10, 10}, {-10, 10}, {-10,10}}, this);
     }
 
 protected:

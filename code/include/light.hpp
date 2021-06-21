@@ -27,7 +27,13 @@ class DirectionalLight : public Light {
 public:
     DirectionalLight() = delete;
 
-    DirectionalLight(const Vector3f &d, const Vector3f &c) {
+    DirectionalLight(const Vector3f &d, const Vector3f &c, 
+    const Vector3f &p, const Vector3f &a1, const Vector3f &a2, const Vector3f& f = Vector3f({100, 100, 100}))
+    : position(p)
+    , axis1(a1)
+    , axis2(a2)
+    {
+        flux = f;
         direction = d.normalized();
         color = c;
     }
@@ -36,11 +42,10 @@ public:
 
     virtual void genp(Ray &pr, Vector3f *f, int i) override
     {
-        (*f) = flux * (D_PI * 4.0); // flux
-        auto p = 2.0 * D_PI * halton(0, i);
-        auto t = 2.0 * acos(sqrt(1. - halton(1, i)));
-        auto st = sin(t);
-        pr = Ray(position, Vector3f(cos(p) * st, cos(t), sin(p) * st));
+        (*f) = flux * (D_PI * 4.0) * color; // flux
+        auto x1 = axis1 * halton(0, i),
+             x2 = axis2 * halton(1, i);
+        pr = Ray(position + x1 + x2, direction);
     }
 };
 
@@ -59,7 +64,7 @@ public:
 
     virtual void genp(Ray &pr, Vector3f *f, int i) override
     {
-        (*f) = flux * (D_PI * 4.0); // flux
+        (*f) = flux * (D_PI * 4.0) * color; // flux
         auto p = 2.0 * D_PI * halton(0, i);
         auto t = 2.0 * acos(sqrt(1. - halton(1, i)));
         auto st = sin(t);

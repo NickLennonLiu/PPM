@@ -48,7 +48,6 @@ public:
         normal = n;
     }
 
-private:
     float t;
     Material *material;
     Vector3f normal;

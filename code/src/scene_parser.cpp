@@ -210,11 +210,20 @@ Light *SceneParser::parseDirectionalLight() {
     assert (!strcmp(token, "direction"));
     Vector3f direction = readVector3f();
     getToken(token);
+    assert (!strcmp(token, "position"));
+    Vector3f position = readVector3f();
+    getToken(token);
+    assert (!strcmp(token, "axis1"));
+    Vector3f axis1 = readVector3f();
+    getToken(token);
+    assert (!strcmp(token, "axis2"));
+    Vector3f axis2 = readVector3f();
+    getToken(token);
     assert (!strcmp(token, "color"));
     Vector3f color = readVector3f();
     getToken(token);
     assert (!strcmp(token, "}"));
-    return new DirectionalLight(direction, color);
+    return new DirectionalLight(direction, color, position, axis1, axis2);
 }
 
 Light *SceneParser::parsePointLight() {
