@@ -192,6 +192,8 @@ void SceneParser::parseLights() {
             lights[count] = parseDirectionalLight();
         } else if (strcmp(token, "PointLight") == 0) {
             lights[count] = parsePointLight();
+        } else if (strcmp(token, "AreaLight") == 0) {
+            lights[count] = parseAreaLight();
         } else {
             printf("Unknown token in parseLight: '%s'\n", token);
             exit(0);
@@ -224,6 +226,27 @@ Light *SceneParser::parseDirectionalLight() {
     getToken(token);
     assert (!strcmp(token, "}"));
     return new DirectionalLight(direction, color, position, axis1, axis2);
+}
+
+Light *SceneParser::parseAreaLight() {
+    char token[MAX_PARSER_TOKEN_LENGTH];
+    getToken(token);
+    assert (!strcmp(token, "{"));
+    getToken(token);
+    assert (!strcmp(token, "position"));
+    Vector3f position = readVector3f();
+    getToken(token);
+    assert (!strcmp(token, "axis1"));
+    Vector3f axis1 = readVector3f();
+    getToken(token);
+    assert (!strcmp(token, "axis2"));
+    Vector3f axis2 = readVector3f();
+    getToken(token);
+    assert (!strcmp(token, "color"));
+    Vector3f color = readVector3f();
+    getToken(token);
+    assert (!strcmp(token, "}"));
+    return new AreaLight(color, position, axis1, axis2);
 }
 
 Light *SceneParser::parsePointLight() {
@@ -287,16 +310,16 @@ Material *SceneParser::parseMaterial() {
             specularColor = readVector3f();
         } else if (strcmp(token, "shininess") == 0) {
             shininess = readFloat();
-        } else if (strcmp(token, "texture") == 0) {
+        } else 
+        */
+        if (strcmp(token, "texture") == 0) {
             // Optional: read in texture and draw it.
             getToken(filename);
-        } 
-        */
-       if (strcmp(token, "Color") == 0) {
-           Color = readVector3f();
-       } else if (strcmp(token, "type") == 0) {
-           type = readInt();
-       } else {
+        } else if (strcmp(token, "Color") == 0) {
+            Color = readVector3f();
+        } else if (strcmp(token, "type") == 0) {
+            type = readInt();
+        } else {
             assert (!strcmp(token, "}"));
             break;
         }

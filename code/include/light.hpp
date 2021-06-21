@@ -49,6 +49,40 @@ public:
     }
 };
 
+class AreaLight: public Light {
+    Vector3f position;
+    Vector3f axis1, axis2;
+    Vector3f n1, n2;
+    Vector3f direction;
+public:
+    AreaLight() = delete;
+
+    AreaLight(const Vector3f &c, const Vector3f &p, 
+            const Vector3f &a1, const Vector3f &a2, 
+            const Vector3f& f = Vector3f({100, 100, 100}))
+    : position(p)
+    , axis1(a1), axis2(a2)
+    {
+        flux = f;
+        color = c;
+        n1 = axis1.normalized(), n2 = axis2.normalized();
+        direction = Vector3f::cross(a1, a2).normalized();
+    }
+
+    ~AreaLight() override = default;
+
+    virtual void genp(Ray& pr, Vector3f *f, int i) override
+    {
+        (*f) = flux * (D_PI * 4.0) * color; // flux
+        auto x1 = axis1 * halton(0, i),
+             x2 = axis2 * halton(1, i);
+        auto p = 2.0 * D_PI * halton(2, i);
+        auto t = halton(3, i);
+        t = 1 - t*t;
+        pr = Ray(position + x1 + x2, direction * t + (n1 * sin(p) + n2 * cos(p)) * sqrt(1 - t * t));
+    }
+};
+
 class PointLight : public Light {
     Vector3f position;
 public:

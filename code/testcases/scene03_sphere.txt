@@ -1,5 +1,5 @@
 Photon {
-    num 100000
+    num 10000
 }
 
 PerspectiveCamera {
@@ -13,8 +13,10 @@ PerspectiveCamera {
 
 Lights {
     numLights 1
-    PointLight {
-        position 2 2 -3
+    AreaLight {
+        position -2 -2 0
+        axis1 0 4 0
+        axis2 4 0 0
         color 0 0.2 0.8
     }
 }
