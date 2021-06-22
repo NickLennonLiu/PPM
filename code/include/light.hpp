@@ -74,12 +74,14 @@ public:
     virtual void genp(Ray& pr, Vector3f *f, int i) override
     {
         (*f) = flux * (D_PI * 4.0) * color; // flux
-        auto x1 = axis1 * halton(0, i),
-             x2 = axis2 * halton(1, i);
-        auto p = 2.0 * D_PI * halton(2, i);
-        auto t = halton(3, i);
-        t = 1 - t*t;
-        pr = Ray(position + x1 + x2, direction * t + (n1 * sin(p) + n2 * cos(p)) * sqrt(1 - t * t));
+        auto angle = 2.0 * D_PI * halton(0, i);
+        auto radius = halton(3,i);
+        auto x1 = axis1 * sin(angle),
+             x2 = axis2 * cos(angle);
+        auto p = 2.0 * D_PI * halton(1, i);
+        auto t = halton(2, i);
+        //t = 1 - t*t;
+        pr = Ray(position + (x1 + x2) * radius, direction * t + (n1 * sin(p) + n2 * cos(p)) * sqrt(1 - t * t));
     }
 };
 

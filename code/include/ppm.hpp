@@ -10,21 +10,19 @@
 #include <cmath>
 #include <cstdlib>
 #include <cstdio>
-//#include <bitmap.h>
-//#include <math_util.h>
 #include <list>
 #include <vector>
 #include <chrono>
-//#include <sphere.h>
-//#include <hitrecord.h>
 #include "hitrecord.hpp"
-//#include "aabb.hpp"
 #include "sphere.hpp"
 #include "bbox.hpp"
 #include "material.hpp"
 #include "halton.hpp"
 #include "group.hpp"
 #include "image.hpp"
+#include "Perlin.hpp"
+#include "FractalNoise.hpp"
+#include "texture.hpp"
 
 #define PHOTON_COUNT_MUTIPLIER 1000
 
@@ -47,7 +45,8 @@ namespace /* anonymous */
     SceneParser* parser;
     Image* _img;
     int _w;
-
+    Perlin perlin;
+    FractalNoise fractal;
 } // namespace
 
 //-------------------------------------------------------------------------------------------
@@ -134,14 +133,22 @@ void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &ad
     int id;
     Hit h;
     dpt++;
-    if (!group->intersect(r, h, 1e-2) || (dpt >= 20))
+    if (!group->intersect(r, h, 0.5) || (dpt >= 20))
         return;
 
     auto d3 = dpt * 3;
 
     auto x = r.pointAtParameter(h.getT()), n = h.normal;
     auto material = h.material;
-    auto f = material->Color;
+    Vector3f f;
+    if(material->texture_type == 1) // Wood
+    {
+        f = wood(x, &perlin);
+    } else if(material->texture_type == 2)  // Marble
+    {
+        f = marble(x, &perlin);
+    } else
+        f = material->Color;
     auto nl = ((Vector3f::dot(r.direction, n)) < 0) ? n : n * -1;
     auto p = (f.x() > f.y() && f.x() > f.z()) ? f.x() : (f.y() > f.z()) ? f.y() : f.z();
 

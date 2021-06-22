@@ -11,6 +11,9 @@ SET(PA1_SOURCES
         src/image.cpp
         src/main.cpp
         src/mesh.cpp
+        src/Perlin.cpp
+        src/FractalNoise.cpp
+        src/bmp.cpp
         src/scene_parser.cpp)
 
 SET(PA1_INCLUDES
@@ -33,6 +36,10 @@ SET(PA1_INCLUDES
         include/revsurface.hpp
         include/kdnode.hpp
         include/halton.hpp
+        include/Perlin.hpp
+        include/FractalNoise.hpp
+        include/texture.hpp
+        include/bmp.hpp
         )
 
 SET(CMAKE_CXX_STANDARD 11)

@@ -16,6 +16,7 @@
 #include "transform.hpp"
 #include "curve.hpp"
 #include "revsurface.hpp"
+#include "bmp.hpp"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -299,6 +300,8 @@ Material *SceneParser::parseMaterial() {
     filename[0] = 0;
     Vector3f Color(1, 1, 1);
     int type = 0;
+    int texture_type = 0;
+    vector<Vector3f>* vec;
     getToken(token);
     assert (!strcmp(token, "{"));
     while (true) {
@@ -315,16 +318,22 @@ Material *SceneParser::parseMaterial() {
         if (strcmp(token, "texture") == 0) {
             // Optional: read in texture and draw it.
             getToken(filename);
+            BITMAPFILEHEADER fheader;
+            BITMAPINFOHEADER iheader;
+            vec = bmp(filename, fheader, iheader);
+            texture_type = 3;
         } else if (strcmp(token, "Color") == 0) {
             Color = readVector3f();
         } else if (strcmp(token, "type") == 0) {
             type = readInt();
+        } else if (strcmp(token, "ttype") == 0) {
+            texture_type = readInt();
         } else {
             assert (!strcmp(token, "}"));
             break;
         }
     }
-    auto *answer = new Material(Color, type);
+    auto *answer = new Material(Color, type, texture_type, vec);
     return answer;
 }
 
