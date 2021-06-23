@@ -17,6 +17,7 @@
 #include "curve.hpp"
 #include "revsurface.hpp"
 #include "bmp.hpp"
+#include "surface.hpp"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -360,6 +361,8 @@ Object3D *SceneParser::parseObject(char token[MAX_PARSER_TOKEN_LENGTH]) {
         answer = (Object3D *) parseBsplineCurve();
     } else if (!strcmp(token, "RevSurface")) {
         answer = (Object3D *) parseRevSurface();
+    } else if (!strcmp(token, "BezierSurface")) {
+        answer = (Object3D *) parseBezierSurface();
     } else {
         printf("Unknown token in parseObject: '%s'\n", token);
         exit(0);
@@ -534,6 +537,40 @@ Curve *SceneParser::parseBsplineCurve() {
         }
     }
     Curve *answer = new BsplineCurve(controls);
+    return answer;
+}
+
+BezierSurface* SceneParser::parseBezierSurface()
+{
+    char token[MAX_PARSER_TOKEN_LENGTH];
+    getToken(token);
+    assert (!strcmp(token, "{"));
+    getToken(token);
+    assert (!strcmp(token, "size"));
+    int m = readInt();
+    int n = readInt();
+
+    getToken(token);
+    assert (!strcmp(token, "controls"));
+    vector<vector<Vector3f>> controls;
+    controls.clear();
+    for(int i = 0; i < m; ++i)
+    {
+        vector<Vector3f> row;
+        for(int j = 0; j < n; ++j)
+        {
+            getToken(token);
+            if (!strcmp(token, "[")) {
+                row.push_back(readVector3f());
+                getToken(token);
+                assert (!strcmp(token, "]"));
+            }
+        }
+        controls.push_back(row);
+    }
+    getToken(token);
+    assert (!strcmp(token, "}"));
+    BezierSurface* answer = new BezierSurface(controls, current_material);
     return answer;
 }
 

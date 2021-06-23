@@ -13,8 +13,10 @@ PerspectiveCamera {
 
 Lights {
     numLights 1
-    PointLight {
-        position 1 0 -2
+    AreaLight {
+        position 2 0 0
+        axis1 -0.5 0 0.5
+        axis2 0 1 0
         color 1 1 1
     }
 }
@@ -27,10 +29,10 @@ Materials {
     numMaterials 3
     Material { 
         ttype 2
-        type 0
+        type 2
     }
     Material {
-        ttype 2
+        ttype 1
         type 0
     }
     Material { Color 0.7 0.7 0.7
@@ -43,8 +45,8 @@ Group {
     numObjects 7
     MaterialIndex 0
     Sphere {
-        center 0 0 -3.5
-        radius 1
+        center 0 0 -3
+        radius 1.5
     } 
     MaterialIndex 1
     Sphere {

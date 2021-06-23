@@ -12,6 +12,7 @@ struct HitRecord
     double r2;
     unsigned int n;
     int idx;
+    bool background;
 };
 
 #endif // HITRECORD_H

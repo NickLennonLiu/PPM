@@ -16,6 +16,7 @@ class Transform;
 class Mesh;
 class Curve;
 class RevSurface;
+class BezierSurface;
 
 #define MAX_PARSER_TOKEN_LENGTH 1024
 
@@ -91,6 +92,7 @@ private:
     Curve *parseBezierCurve();
     Curve *parseBsplineCurve();
     RevSurface *parseRevSurface();
+    BezierSurface *parseBezierSurface();
 
     int getToken(char token[MAX_PARSER_TOKEN_LENGTH]);
 

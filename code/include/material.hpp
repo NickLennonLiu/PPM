@@ -6,6 +6,8 @@
 #include <iostream>
 #include "ray.hpp"
 #include "hit.hpp"
+#include <vector>
+using namespace std;
 
 class Material {
 public:
@@ -17,7 +19,7 @@ public:
 
     virtual ~Material()
     {
-        delete uv;
+        //delete uv;
     }
 
     virtual Vector3f getColor() const {
@@ -36,6 +38,14 @@ public:
     int type; // 0: Matte 1: Mirror, 2: Glass
     int texture_type;
     vector<Vector3f>* uv;
+};
+
+class TriangleMaterial : public Material{
+    
+};
+
+class SphereMaterial : public Material {
+
 };
 
 

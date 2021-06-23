@@ -128,7 +128,6 @@ vector<Vector3f>* bmp(char *filename, BITMAPFILEHEADER& FileHeader, BITMAPINFOHE
     
     // Close file and delete vec
     bmpfile.close();
-    delete vec;
   }
   else
   {

@@ -32,7 +32,7 @@ namespace /* anonymous */
     //-------------------------------------------------------------------------------------------
     // Constant Values
     //-------------------------------------------------------------------------------------------
-    static const double ALPHA = 0.7; // the alpha parameter of PPM
+    static const double ALPHA = 0.8; // the alpha parameter of PPM
 
     //-------------------------------------------------------------------------------------------
     // Global Variables
@@ -45,6 +45,10 @@ namespace /* anonymous */
     SceneParser* parser;
     Image* _img;
     int _w;
+    float nc = 1.0, nt = 1.5;
+    float R0 = 0.04;
+    int num_photon;
+    Vector3f background;
     Perlin perlin;
     FractalNoise fractal;
 } // namespace
@@ -78,6 +82,12 @@ void build_hash_grid(
     for (auto itr = hitpoints.begin(); itr != hitpoints.end(); ++itr)
     {
         auto hp = (*itr);
+        if(hp->background)
+        {
+            hp->flux = background;
+            hp->r2 = 1;
+            continue;
+        }
         hp->r2 = irad * irad;
         hp->n = 0;
         hp->flux = Vector3f();
@@ -133,8 +143,16 @@ void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &ad
     int id;
     Hit h;
     dpt++;
-    if (!group->intersect(r, h, 0.5) || (dpt >= 20))
+    if (!group->intersect(r, h, 1e-3) || (dpt >= 20))
+    {
+        if(!m || (dpt >= 20))
+            return;
+        auto hp = new HitRecord;
+        hp->background = true;
+        hp->idx = i;
+        hitpoints.push_back(hp);
         return;
+    }
 
     auto d3 = dpt * 3;
 
@@ -146,7 +164,7 @@ void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &ad
         f = wood(x, &perlin);
     } else if(material->texture_type == 2)  // Marble
     {
-        f = marble(x, &perlin);
+        f = rainbow(x, &perlin);
     } else
         f = material->Color;
     auto nl = ((Vector3f::dot(r.direction, n)) < 0) ? n : n * -1;
@@ -159,6 +177,7 @@ void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &ad
             // eye ray
             // store the measurment point
             auto hp = new HitRecord;
+            hp->background = false;
             hp->f = f * adj;
             hp->pos = x;
             hp->nrm = n;
@@ -219,9 +238,7 @@ void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &ad
     {
         Ray lr(x, Vector3f::reflect(r.direction, n));
         auto into = Vector3f::dot(n, nl) > 0.0;
-        auto nc = 1.0;
-        auto nt = 1.5;
-        auto nnt = (into) ? nc / nt : nt / nc;
+        auto nnt = (into) ? 0.6666667 : 1.5;
         auto ddn = Vector3f::dot(r.direction, nl);
         auto cos2t = 1 - nnt * nnt * (1 - ddn * ddn);
 
@@ -230,12 +247,8 @@ void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &ad
             return trace(lr, dpt, m, (f * fl), (f * adj), i, depth+1);
 
         auto td = (r.direction * nnt - n * ((into ? 1 : -1) * (ddn * nnt + sqrt(cos2t)))).normalized();
-        auto a = nt - nc;
-        auto b = nt + nc;
-        auto R0 = a * a / (b * b);
         auto c = 1 - (into ? -ddn : Vector3f::dot(td, n));
         auto Re = R0 + (1 - R0) * c * c * c * c * c;
-        auto P = Re;
         Ray rr(x, td);
         auto fa = f * adj;
         auto ffl = f * fl;
@@ -249,7 +262,7 @@ void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &ad
         else
         {
             // photon ray (pick one via Russian roulette)
-            (halton(d3 - 1, i) < P)
+            (halton(d3 - 1, i) < Re)
                 ? trace(lr, dpt, m, ffl, fa * Re, i, depth+1)
                 : trace(rr, dpt, m, ffl, fa * (1.0 - Re), i, depth+1);
         }
@@ -293,16 +306,16 @@ void trace_ray(int w, int h, Camera* camera)
 //-------------------------------------------------------------------------------------------
 //      Generate and trace photons
 //-------------------------------------------------------------------------------------------
-void trace_photon(int s)
+void trace_photon()
 {
     auto start = std::chrono::system_clock::now();
 
     // trace photon rays with multi-threading
     auto vw = Vector3f(1, 1, 1);
 #pragma omp parallel for schedule(dynamic, 1)
-    for (int i = 0; i < s; i++)
+    for (int i = 0; i < num_photon; i++)
     {
-        auto p = 100.0 * (i + 1) / s;
+        auto p = 100.0 * (i + 1) / num_photon;
         auto tend = std::chrono::system_clock::now();
         auto dif = (tend - start) / p  * (100 - p);
         std::fprintf(stdout, "\rPhotonPass %5.2f%%, passed time: %ld(sec), estimated time remained: %3.1ld(min)", 
@@ -334,7 +347,7 @@ void trace_photon(int s)
 //-------------------------------------------------------------------------------------------
 //      Density estimation
 //-------------------------------------------------------------------------------------------
-void density_estimation(Vector3f *color, int num_photon)
+void density_estimation(Vector3f *color)
 {
     // density estimation
     for (auto itr = hitpoints.begin(); itr != hitpoints.end(); ++itr)
@@ -355,11 +368,13 @@ int ppm(int w, int h, int s, Image* img, SceneParser* _parser)
     group->getKdTree();
     hpbbox.reset();
     parser = _parser;
+    num_photon = s;
     _img = img;
     _w = w;
+    background = parser->getBackgroundColor() * D_PI  * num_photon * PHOTON_COUNT_MUTIPLIER;
     trace_ray(w, h, _parser->getCamera());
-    trace_photon(s);
-    density_estimation(c, s);
+    trace_photon();
+    density_estimation(c);
 
     const auto kGamma = 2.2;
     // TODO(edit Image.SetPixel() to have gamma argument)
