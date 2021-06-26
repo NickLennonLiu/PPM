@@ -28,7 +28,7 @@ public:
             return false;
         
         Vector3f n = Vector3f::dot(r.getDirection(), normal) > 0 ? -normal : normal;
-        h.set(t, material, n);
+        h.set(t, n, material->Color, material->type, material->texture_type);
         return true;
     }
 

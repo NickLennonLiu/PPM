@@ -27,14 +27,6 @@ public:
     }
 
     bool intersect(const Ray &r, Hit &h, float tmin) override {
-        /*
-        bool result = false;
-        for(int i = 0; i < num_objects; ++i)
-        {
-            result |= objs[i]->intersect(r, h, tmin);
-        }
-        return result;
-        */
         return root->intersect(r, h, tmin);
     }
 

@@ -24,7 +24,7 @@ Background {
 }
 
 Materials {
-    numMaterials 2
+    numMaterials 3
     Material { Color 0.7 0.7 0.7
         ttype 0
         type 0
@@ -32,11 +32,14 @@ Materials {
     Material { Color 0.4 0.6 0.4
         type 0
     }
+    Material {
+        texture textures/scene06.bmp
+    }
 }
 
 Group {
     numObjects 2
-    MaterialIndex 0
+    MaterialIndex 1
     Transform {
         Translate 0 2 0
         UniformScale 1
@@ -45,7 +48,7 @@ Group {
             obj_file mesh/horse.fine.90k.obj
         }
     }
-    MaterialIndex 1
+    MaterialIndex 0
     Transform {
         Translate -15 15 -1
         XRotate 90

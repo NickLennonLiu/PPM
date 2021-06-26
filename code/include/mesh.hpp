@@ -24,6 +24,7 @@ public:
     };
 
     std::vector<Vector3f> v;
+    std::vector<std::pair<int, int>> vts;
     std::vector<TriangleIndex> t;
     std::vector<Vector3f> n;
     std::vector<Triangle> triangles;

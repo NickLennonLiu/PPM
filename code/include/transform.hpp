@@ -31,14 +31,14 @@ public:
         Ray tr(trSource, trDirection);
         bool inter = o->intersect(tr, h, tmin);
         if (inter) {
-            h.set(h.getT(), h.getMaterial(), transformDirection(transform.transposed(), h.getNormal()).normalized());
+            h.set(h.getT(), transformDirection(transform.transposed(), h.getNormal()).normalized(), h.f, h.type, h.ttype);
         }
         return inter;
     }
 
     AABB bbox() override
     {
-        return AABB({{-10, 10}, {-10, 10}, {-10,10}}, this);
+        return AABB({{-50, 50}, {-50, 50}, {-50,50}}, this);
     }
 
 protected:

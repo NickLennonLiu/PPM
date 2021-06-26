@@ -4,6 +4,7 @@
 #include "object3d.hpp"
 #include "hit.hpp"
 #include <vector>
+#include <queue>
 
 class KdNode
 {
@@ -13,25 +14,31 @@ public:
     AABB bbox;
     KdNode(AABB b, KdNode*lc = nullptr, KdNode* rc = nullptr)
     : lc(lc), rc(rc), bbox(b) {
-        //cout << lc <<" " <<  rc << bbox << " " << bbox.content << endl;
     }
 
     bool intersect(const Ray &r, Hit &h, float tmin)
     {
+        std::queue<KdNode*> que;
+        que.push(this);
         Hit tmp;
         Hit th;
-        if(!bbox.intersect(r, th, tmin))
-            return false;
-        // 叶节点
-        if(lc == nullptr && rc == nullptr)
-        {
-            return bbox.content->intersect(r,h,tmin);
-        }
         bool re = false;
-        if(lc)
-            re |= lc->intersect(r, h, tmin);
-        if(rc)
-            re |= rc->intersect(r, h, tmin);
+        while(!que.empty())
+        {
+            th = tmp;
+            KdNode* cur = que.front();
+            que.pop();
+            if(!cur->bbox.intersect(r, th, tmin))
+                continue;
+            if(cur->lc == nullptr && cur->rc == nullptr)
+            {
+                re |= cur->bbox.content->intersect(r, h, tmin);
+            }
+            if(cur->lc)
+                que.push(cur->lc);
+            if(cur->rc)
+                que.push(cur->rc);       
+        }
         return re;
     }
 

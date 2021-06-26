@@ -25,12 +25,10 @@ public:
     ~Sphere() override = default;
 
     bool intersect(const Ray &r, Hit &h, float tmin) override {
-        //bool re = box.intersect(r, h, tmin);
-        //return re;
         Vector3f dir = r.getDirection().normalized();
         Vector3f l = (center - r.getOrigin());      // 球心与视线来源的连线
         float l2 = l.squaredLength();
-        bool inside =  (l2 < (radius * radius));       // 光源在球体内部       
+        bool inside =  (l2 < (radius * radius)-1e-2);       // 光源在球体内部       
         
         float tp = Vector3f::dot(l,dir);   
         if (tp < 0 && !inside)                     // 光线方向与球心方向相反
@@ -49,7 +47,9 @@ public:
             return false;
         else
         {
-            h.set(t, material, (r.pointAtParameter(t / r.getDirection().length()) - center).normalized());
+            h.set(t, 
+                (r.pointAtParameter(t / r.getDirection().length()) - center).normalized(), 
+                getColor(), material->type, material->texture_type);
             return true;
         }
 
@@ -64,6 +64,11 @@ public:
 protected:
     float radius;
     Vector3f center;
+
+    Vector3f getColor(const Vector3f& inter = Vector3f::ZERO)
+    {
+        return material->Color;
+    }
 };
 
 

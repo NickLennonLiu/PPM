@@ -1,4 +1,7 @@
 #include "bmp.hpp"
+#include <vecmath.h>
+#include "ray.hpp"
+// Original Code from: https://blog.taoky.moe/attachments/bmp1.cpp
 
 inline int ToHumanRead(char *str, int size)
 {
@@ -51,7 +54,6 @@ vector <Pixel> * ReadBitmap(ifstream& bmpfile, BITMAPINFOHEADER& InfoHeader)
   int linebyte = width * ToHumanRead(InfoHeader.biBitCount) / 8;
   offset = linebyte % 4;
   if (offset != 0) offset = 4 - offset; // "linebyte" should be the multiple of 4
-  // cout << "Bytes per line: " << linebyte << endl;
   cout << "Offset: " << offset << endl;
   vector <Pixel> *vec = new vector <Pixel> [abs(height)];
   // Height could be a negative number.
@@ -88,14 +90,13 @@ Vector3f ToColor(Pixel p)
     int r = (int)p.r;
     int g = (int)p.g;
     int b = (int)p.b;
-    return Vector3f(r/255.0f, g/255.0f, b/255.0f);
-
+    return Vector3f(r/255.0, g/255.0, b/255.0);
 }
 
-vector<Vector3f>* bmp(char *filename, BITMAPFILEHEADER& FileHeader, BITMAPINFOHEADER& InfoHeader)
+vector<Vector3f> bmp(char *filename, BITMAPFILEHEADER& FileHeader, BITMAPINFOHEADER& InfoHeader)
 {
   vector<Pixel>* vec;
-  vector<Vector3f>* texture = new vector<Vector3f>;
+  vector<Vector3f> texture;
   ifstream bmpfile;
   bmpfile.open(filename, ios::in | ios::binary); // open the file
   if (bmpfile.is_open())
@@ -104,35 +105,27 @@ vector<Vector3f>* bmp(char *filename, BITMAPFILEHEADER& FileHeader, BITMAPINFOHE
     if (strncmp(FileHeader.bfType, "BM", 2) != 0) // Judge whether a BMP.
     {
       cout << "Not a BMP File, or an Unsupported OS/2 BMP File." << endl;
-      return nullptr;
+      return vector<Vector3f>();
     }
     bmpfile.read((char *)&InfoHeader, sizeof(InfoHeader)); // Read BITMAPINFOHEADER
     /* Information Output */
     cout << "=============Texture Information===============" << endl;
     Output_FileHeader(FileHeader);
     Output_InfoHeader(InfoHeader);
-    cout << "===============================================" << endl;
     /* Output End */
     vec = ReadBitmap(bmpfile, InfoHeader); // Read the data
     cout << "Finished reading bmp" << endl;
-    /*
-    int x, y;
-    while (cin >> x >> y)
-    {
-      if (x == -1) break;
-      PrintLocation(x, y, vec);
-    }
-    */
-    for(auto &i : *vec)
-        texture->push_back(ToColor(i));
-    
-    // Close file and delete vec
+    cout << "===============================================" << endl;
+    for(int i = 0; i < 500; ++i)
+      for(int j = 0; j < 500; ++j)
+        texture.push_back(ToColor(vec[i][j]));
+        
     bmpfile.close();
   }
   else
   {
     cout << "Open File Error." << endl;
-    return nullptr;
+    return vector<Vector3f>();
   }
   return texture;
 }

@@ -143,10 +143,11 @@ void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &ad
     int id;
     Hit h;
     dpt++;
-    if (!group->intersect(r, h, 1e-3) || (dpt >= 20))
+    if (!group->intersect(r, h, 1e-2) || (dpt >= 10))
     {
         if(!m || (dpt >= 20))
             return;
+            
         auto hp = new HitRecord;
         hp->background = true;
         hp->idx = i;
@@ -154,23 +155,30 @@ void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &ad
         return;
     }
 
+    
     auto d3 = dpt * 3;
 
     auto x = r.pointAtParameter(h.getT()), n = h.normal;
-    auto material = h.material;
-    Vector3f f;
-    if(material->texture_type == 1) // Wood
+    Vector3f f = h.f;
+    int type = h.type, ttype = h.ttype;
+    if(ttype != 0)
     {
-        f = wood(x, &perlin);
-    } else if(material->texture_type == 2)  // Marble
-    {
-        f = rainbow(x, &perlin);
-    } else
-        f = material->Color;
+       if(ttype == 2) // Wood
+        {
+            f = wood(x, &perlin);
+        } else if(ttype == 3)  // Marble
+        {
+            f = marble(x, &perlin);
+        } else if(ttype == 4)
+        {
+            f = rainbow(x, &perlin);
+        } 
+    }
+    
     auto nl = ((Vector3f::dot(r.direction, n)) < 0) ? n : n * -1;
     auto p = (f.x() > f.y() && f.x() > f.z()) ? f.x() : (f.y() > f.z()) ? f.y() : f.z();
 
-    if (material->type == 0) // Matte
+    if (type == 0) // Matte
     {
         if (m)
         {
@@ -230,7 +238,7 @@ void trace(const Ray &r, int dpt, bool m, const Vector3f &fl, const Vector3f &ad
                 trace(Ray(x, d), dpt, m, (f * fl) * (1. / p), (f * adj), i, depth+1);
         }
     }
-    else if (material->type == 1) // Mirror
+    else if (type == 1) // Mirror
     {
         trace(Ray(x, Vector3f::reflect(r.direction, n)), dpt, m, (f * fl), (f * adj), i, depth+1);
     }
@@ -377,8 +385,6 @@ int ppm(int w, int h, int s, Image* img, SceneParser* _parser)
     density_estimation(c);
 
     const auto kGamma = 2.2;
-    // TODO(edit Image.SetPixel() to have gamma argument)
-    //save_to_bmp("image.bmp", w, h, &c[0].x, kGamma);
 
     for(int i = 0; i < (w*h); ++i)    // idx = x + y * w
         img->SetPixel(i % w, i / w, c[i]);

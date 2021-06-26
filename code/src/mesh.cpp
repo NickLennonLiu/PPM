@@ -25,7 +25,6 @@ bool Mesh::intersect(const Ray &r, Hit &h, float tmin) {
 }
 
 Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
-
     // Optional: Use tiny obj loader to replace this simple one.
     std::ifstream f;
     f.open(filename);
@@ -53,11 +52,12 @@ Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
         }
         std::stringstream ss(line);
         ss >> tok;
-        if (tok == vTok) {
+        if (tok == vTok) {  // Vertices
             Vector3f vec;
             ss >> vec[0] >> vec[1] >> vec[2];
             v.push_back(vec);
-        } else if (tok == fTok) {
+            vts.push_back({0,0});
+        } else if (tok == fTok) {   // Faces
             if (line.find(bslash) != std::string::npos) {
                 std::replace(line.begin(), line.end(), bslash, space);
                 std::stringstream facess(line);
@@ -76,10 +76,11 @@ Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
                 }
                 t.push_back(trig);
             }
-        } else if (tok == texTok) {
-            Vector2f texcoord;
-            ss >> texcoord[0];
-            ss >> texcoord[1];
+        } else if (tok == texTok) { // Texture point
+            int vid, u, v;
+            ss >> vid >> u >> v;
+            vts[vid-1].first = u;
+            vts[vid-1].second = v;
         }
     }
     computeNormal();
@@ -105,10 +106,17 @@ void Mesh::getKdTree() {
         TriangleIndex &triIndex = t[triId];
         Triangle triangle(v[triIndex[0]],
                           v[triIndex[1]], v[triIndex[2]], material);
+
         //TODO: Figure out a way to specify vertice norm
         triangle.normals[0] = n[triId];
         triangle.normals[1] = n[triId];
         triangle.normals[2] = n[triId];
+        triangle.texcord[0][0] = vts[triIndex[0]].first;
+        triangle.texcord[0][1] = vts[triIndex[0]].second;
+        triangle.texcord[1][0] = vts[triIndex[1]].first;
+        triangle.texcord[1][1] = vts[triIndex[1]].second;
+        triangle.texcord[2][0] = vts[triIndex[2]].first;
+        triangle.texcord[2][1] = vts[triIndex[2]].second;
         triangles.push_back(triangle);
         //bboxs.push_back(triangle.bbox());
     }

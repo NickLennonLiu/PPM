@@ -12,7 +12,7 @@
 #include <cmath>
 
 Perlin::Perlin() {
-	srand(time(NULL));
+	srand(123);
 
 	p = new int[256];
 	Gx = new float[256];

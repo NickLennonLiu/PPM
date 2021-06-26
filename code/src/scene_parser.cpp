@@ -226,8 +226,11 @@ Light *SceneParser::parseDirectionalLight() {
     assert (!strcmp(token, "color"));
     Vector3f color = readVector3f();
     getToken(token);
+    assert (!strcmp(token, "flux"));
+    Vector3f flux = readFloat();
+    getToken(token);
     assert (!strcmp(token, "}"));
-    return new DirectionalLight(direction, color, position, axis1, axis2);
+    return new DirectionalLight(direction, color, position, axis1, axis2, flux);
 }
 
 Light *SceneParser::parseAreaLight() {
@@ -247,8 +250,11 @@ Light *SceneParser::parseAreaLight() {
     assert (!strcmp(token, "color"));
     Vector3f color = readVector3f();
     getToken(token);
+    assert (!strcmp(token, "flux"));
+    Vector3f flux = readFloat();
+    getToken(token);
     assert (!strcmp(token, "}"));
-    return new AreaLight(color, position, axis1, axis2);
+    return new AreaLight(color, position, axis1, axis2, flux);
 }
 
 Light *SceneParser::parsePointLight() {
@@ -262,8 +268,11 @@ Light *SceneParser::parsePointLight() {
     assert (!strcmp(token, "color"));
     Vector3f color = readVector3f();
     getToken(token);
+    assert (!strcmp(token, "flux"));
+    Vector3f flux = readFloat();
+    getToken(token);
     assert (!strcmp(token, "}"));
-    return new PointLight(position, color);
+    return new PointLight(position, color, flux);
 }
 // ====================================================================
 // ====================================================================
@@ -302,7 +311,7 @@ Material *SceneParser::parseMaterial() {
     Vector3f Color(1, 1, 1);
     int type = 0;
     int texture_type = 0;
-    vector<Vector3f>* vec;
+    vector<Vector3f> vec;
     getToken(token);
     assert (!strcmp(token, "{"));
     while (true) {
@@ -322,7 +331,7 @@ Material *SceneParser::parseMaterial() {
             BITMAPFILEHEADER fheader;
             BITMAPINFOHEADER iheader;
             vec = bmp(filename, fheader, iheader);
-            texture_type = 3;
+            texture_type = 1;
         } else if (strcmp(token, "Color") == 0) {
             Color = readVector3f();
         } else if (strcmp(token, "type") == 0) {

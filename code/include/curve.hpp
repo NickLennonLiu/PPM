@@ -136,6 +136,7 @@ struct CurvePoint {
 
 class Curve : public Object3D {
 protected:
+    Bernstein *bernstein;
     std::vector<Vector3f> controls;
     std::vector<CurvePoint> samplePoints;
 public:
@@ -152,28 +153,6 @@ public:
 
     virtual void discretize(int resolution, std::vector<CurvePoint>& data) = 0;
 
-    /*
-    void drawGL() override {
-        Object3D::drawGL();
-        glPushAttrib(GL_ALL_ATTRIB_BITS);
-        glDisable(GL_LIGHTING);
-        glColor3f(1, 1, 0);
-        glBegin(GL_LINE_STRIP);
-        for (auto & control : controls) { glVertex3fv(control); }
-        glEnd();
-        glPointSize(4);
-        glBegin(GL_POINTS);
-        for (auto & control : controls) { glVertex3fv(control); }
-        glEnd();
-        std::vector<CurvePoint> sampledPoints;
-        discretize(30, sampledPoints);
-        glColor3f(1, 1, 1);
-        glBegin(GL_LINE_STRIP);
-        for (auto & cp : sampledPoints) { glVertex3fv(cp.V); }
-        glEnd();
-        glPopAttrib();
-    }
-    */
 };
 
 class BezierCurve : public Curve {
@@ -188,18 +167,17 @@ public:
 
     void discretize(int resolution, std::vector<CurvePoint>& data) override {
         data.clear();
-        // TODO (PA3): fill in data vector
         // resolution: 每一小段[ti, ti_1)中等距采样的点的个数
         int n = controls.size() - 1;
         int k = n;
         std::vector<double> knots = Bernstein::bezier_knot(k);
-        Bernstein bezier = Bernstein(n, k, knots);
-        double start = bezier.vstart(), end = bezier.vend();
+        bernstein = new Bernstein(n, k, knots);
+        double start = bernstein->vstart(), end = bernstein->vend();
         double step = (end - start) / (n+1 - k) / resolution;
         std::vector<double> s, ds;
         while(start < end)
         {
-            int lsk = bezier.evalute(start, s, ds);
+            int lsk = bernstein->evalute(start, s, ds);
             CurvePoint p;
             p.T = p.V = Vector3f();
             for(int i = 0; i < s.size(); ++i)
@@ -228,16 +206,15 @@ public:
 
     void discretize(int resolution, std::vector<CurvePoint>& data) override {
         data.clear();
-        // TODO (PA3): fill in data vector
         int n = controls.size() - 1, k = 3;
         std::vector<double> knots = Bernstein::tknots(n, k);
-        Bernstein bspline = Bernstein(n, k, knots);
-        double start = bspline.vstart(), end = bspline.vend();
+        bernstein = new Bernstein(n, k, knots);
+        double start = bernstein->vstart(), end = bernstein->vend();
         double step = (end - start) / (n + 1 - k) / resolution;
         std::vector<double> s, ds;
         while (start < end)
         {
-            int lsk = bspline.evalute(start, s, ds);
+            int lsk = bernstein->evalute(start, s, ds);
             CurvePoint p;
             p.T = p.V = Vector3f();
             for (int i = 0; i < s.size(); ++i)

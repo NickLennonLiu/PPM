@@ -18,6 +18,7 @@ class AABB
     // 3个平面确定一个包围盒
     
 public:
+    float u, v;
     float axis_planes[3][2]; // 0:x, 1:y, 2:z // 0: min, 1: max
     AABB() {}
     explicit AABB(std::vector<std::pair<float, float>> axis, Object3D* content = nullptr)
@@ -29,7 +30,6 @@ public:
     }
     bool intersect(const Ray &r, Hit &h, float tmin)
     {
-        //cout << "Start intersecting" << endl;
         Vector3f o = r.getOrigin();
         if(inside(o))
             return true;
@@ -74,7 +74,6 @@ public:
         if(ans.getT() > h.getT() || ans.getT() < tmin)
             return false;
         h = ans;
-        //h.set(h.getT(), material, h.getNormal());
         return re;
     }
 
@@ -121,14 +120,12 @@ protected:
     {
         Vector3f normal(dir[axis][0], dir[axis][1], dir[axis][2]);
         float D = -axis_planes[axis][direction];
-        //Plane p(normal, D, nullptr);
-        //p.intersect(r, h, 0);
         float t = -(D + Vector3f::dot(normal, r.getOrigin())) / Vector3f::dot(normal, r.getDirection());
         if (t > h.getT() || t < 0)
             return false;
 
         Vector3f n = Vector3f::dot(r.getDirection(), normal) > 0 ? -normal : normal;
-        h.set(t, nullptr, n);
+        h.set(t, n);
         return true;
     }
 };

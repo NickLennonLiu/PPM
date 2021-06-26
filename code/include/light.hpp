@@ -78,10 +78,16 @@ public:
         auto radius = halton(3,i);
         auto x1 = axis1 * sin(angle),
              x2 = axis2 * cos(angle);
+        auto p = 2.0 * D_PI * halton(0, i);
+        auto t = 2.0 * acos(sqrt(1. - halton(1, i)));
+        auto st = sin(t);
+        pr = Ray(position + (x1 + x2) * radius, Vector3f(cos(p) * st, cos(t), sin(p) * st));
+        /*
         auto p = 2.0 * D_PI * halton(1, i);
         auto t = halton(2, i);
-        //t = 1 - t*t;
+        t = 1 - t*t;
         pr = Ray(position + (x1 + x2) * radius, direction * t + (n1 * sin(p) + n2 * cos(p)) * sqrt(1 - t * t));
+        */
     }
 };
 

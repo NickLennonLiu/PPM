@@ -1,5 +1,5 @@
 Photon {
-    num 1000
+    num 10000
 }
 
 PerspectiveCamera {
@@ -8,14 +8,17 @@ PerspectiveCamera {
     up 0 0 1
     angle 45
     width 1024
-    height 768
+    height 1024
 }
 
 Lights {
     numLights 1
-    PointLight {
+    AreaLight {
         position 1 0 -2
+        axis1 0 2 0
+        axis2 0 0 2
         color 1 1 1
+        flux 100
     }
 }
 
@@ -30,7 +33,7 @@ Materials {
         type 0
     }
     Material {
-        ttype 2
+        ttype 3
         type 0
     }
     Material { Color 0.7 0.7 0.7

@@ -54,6 +54,6 @@ vector <Pixel> * ReadBitmap(ifstream& bmpfile, BITMAPINFOHEADER& InfoHeader);
 
 void PrintLocation(int x, int y, vector <Pixel> * vec);
 
-vector<Vector3f>* bmp(char *filename, BITMAPFILEHEADER& FileHeader, BITMAPINFOHEADER& InfoHeader);
+vector<Vector3f> bmp(char *filename, BITMAPFILEHEADER& FileHeader, BITMAPINFOHEADER& InfoHeader);
 
 #endif
